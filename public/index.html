@@ -1,1 +1,663 @@
+<!DOCTYPE html>
+<!-- FranchiseIQ v1.0 -->
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FranchiseIQ — Market Intelligence for Franchise Owners</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --navy:       #1a3a5c;
+    --navy-deep:  #0d2138;
+    --navy-mid:   #2a5080;
+    --navy-light: #4a7fa8;
+    --navy-pale:  #e8f0f7;
+    --gold:       #c9832a;
+    --gold-light: #e8a84a;
+    --gold-pale:  #fdf3e7;
+    --cream:      #f7f5f0;
+    --warm-gray:  #f0ede6;
+    --text-1:     #0d1b2a;
+    --text-2:     #3a4a5c;
+    --text-3:     #7a8a9c;
+    --border:     #dde4ec;
+    --white:      #ffffff;
+    --success:    #1d9e75;
+    --radius:     14px;
+    --radius-sm:  9px;
+    --shadow:     0 4px 20px rgba(13,33,56,0.09);
+    --shadow-lg:  0 12px 48px rgba(13,33,56,0.14);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--cream);
+    color: var(--text-1);
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 70% 50% at 10% 0%, rgba(26,58,92,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 90% 100%, rgba(201,131,42,0.06) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: 36px 24px 80px; }
+
+  /* ── Header ── */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 44px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-mark {
+    width: 44px;
+    height: 44px;
+    background: var(--navy);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .logo-mark svg { width: 24px; height: 24px; }
+
+  .logo-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1;
+  }
+
+  .logo-wordmark {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--navy-deep);
+    letter-spacing: -0.3px;
+  }
+
+  .logo-wordmark span { color: var(--gold); }
+
+  .logo-tagline {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--text-3);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .header-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--gold-pale);
+    color: var(--gold);
+    border: 1px solid rgba(201,131,42,0.2);
+    padding: 5px 12px;
+    border-radius: 999px;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    text-align: center;
+    padding: 20px 0 36px;
+    animation: fadeUp 0.5s 0.1s ease both;
+  }
+
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .hero-eyebrow::before,
+  .hero-eyebrow::after {
+    content: '';
+    display: inline-block;
+    width: 32px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.5;
+  }
+
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    line-height: 1.1;
+    color: var(--text-1);
+    margin-bottom: 16px;
+    letter-spacing: -0.5px;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--navy);
+  }
+
+  .hero-sub {
+    font-size: 1.05rem;
+    font-weight: 300;
+    color: var(--text-2);
+    line-height: 1.65;
+    max-width: 500px;
+    margin: 0 auto 24px;
+  }
+
+  .proof-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .proof-item {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--text-3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .proof-item::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: var(--success);
+    border-radius: 50%;
+  }
+
+  /* ── Form card ── */
+  .form-card {
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    animation: fadeUp 0.5s 0.2s ease both;
+    margin-bottom: 32px;
+  }
+
+  .form-card-header {
+    background: var(--navy);
+    padding: 24px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .form-card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.25rem;
+    color: var(--white);
+  }
+
+  .form-card-title span {
+    display: block;
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.55);
+    margin-top: 3px;
+  }
+
+  .price-tag {
+    text-align: right;
+  }
+
+  .price-tag .amount {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem;
+    color: var(--gold-light);
+    line-height: 1;
+  }
+
+  .price-tag .label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    margin-top: 3px;
+  }
+
+  .form-body { padding: 28px 32px 32px; }
+
+  /* ── Section labels ── */
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--navy-light);
+    margin-bottom: 16px;
+    margin-top: 28px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-label:first-child { margin-top: 0; }
+
+  /* ── Fields ── */
+  .field { margin-bottom: 18px; }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-2);
+    margin-bottom: 7px;
+    letter-spacing: 0.02em;
+  }
+
+  label .opt {
+    font-weight: 300;
+    color: var(--text-3);
+    font-size: 11px;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  select {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'Outfit', sans-serif;
+    font-size: 14px;
+    color: var(--text-1);
+    background: var(--cream);
+    transition: border-color 0.18s, box-shadow 0.18s;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  input:focus, select:focus {
+    border-color: var(--navy-light);
+    box-shadow: 0 0 0 3px rgba(26,58,92,0.1);
+    background: var(--white);
+  }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a8a9c' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    cursor: pointer;
+    padding-right: 36px;
+  }
+
+  /* ── Chips ── */
+  .chip-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .chip {
+    padding: 7px 14px;
+    border-radius: 999px;
+    border: 1.5px solid var(--border);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text-2);
+    background: var(--cream);
+    cursor: pointer;
+    transition: all 0.16s;
+    user-select: none;
+  }
+
+  .chip:hover {
+    border-color: var(--navy-light);
+    color: var(--navy);
+  }
+
+  .chip.selected {
+    background: var(--navy-pale);
+    border-color: var(--navy);
+    color: var(--navy);
+    font-weight: 500;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 28px 0;
+  }
+
+  /* ── CTA ── */
+  .cta-wrap { margin-top: 4px; }
+
+  .cta-btn {
+    width: 100%;
+    padding: 16px 24px;
+    background: var(--navy);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: 'Outfit', sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.16s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    letter-spacing: 0.01em;
+  }
+
+  .cta-btn:hover { background: var(--navy-deep); }
+  .cta-btn:active { transform: scale(0.99); }
+  .cta-btn:disabled { background: var(--text-3); cursor: not-allowed; transform: none; }
+
+  .cta-sub {
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-3);
+    margin-top: 10px;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Deliverables ── */
+  .deliverables-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    animation: fadeUp 0.5s 0.3s ease both;
+  }
+
+  .deliverable {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .del-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: var(--navy-pale);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .del-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-1);
+    margin-bottom: 3px;
+  }
+
+  .del-desc {
+    font-size: 11.5px;
+    color: var(--text-3);
+    line-height: 1.45;
+  }
+
+  .section-header {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    margin-bottom: 14px;
+    text-align: center;
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 560px) {
+    .form-body { padding: 20px; }
+    .form-card-header { padding: 18px 20px; flex-direction: column; align-items: flex-start; gap: 10px; }
+    .field-row { grid-template-columns: 1fr; }
+    .deliverables-grid { grid-template-columns: 1fr; }
+    .page { padding: 20px 16px 60px; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-mark">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" fill="none" stroke="white" stroke-width="1.5"/>
+          <circle cx="12" cy="12" r="2" fill="#c9832a"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <div class="logo-wordmark">Franchise<span>IQ</span></div>
+        <div class="logo-tagline">Market Intelligence</div>
+      </div>
+    </div>
+    <div class="header-badge">WaveMAX Edition</div>
+  </header>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-eyebrow">Local Market Intelligence</div>
+    <h1>Your location.<br><em>Fully decoded.</em></h1>
+    <p class="hero-sub">A complete AI-powered market growth strategy built for your franchise address — competitors, apartments, commercial targets, and a prioritized 90-day action plan.</p>
+    <div class="proof-row">
+      <div class="proof-item">Delivered in minutes</div>
+      <div class="proof-item">4 professional PDF reports</div>
+      <div class="proof-item">Built for WaveMAX owners</div>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div class="form-card">
+    <div class="form-card-header">
+      <div class="form-card-title">
+        Build my Market Growth Strategy
+        <span>Takes about 2 minutes · Generates instantly</span>
+      </div>
+      <div class="price-tag">
+        <div class="amount">$197</div>
+        <div class="label">one-time</div>
+      </div>
+    </div>
+
+    <div class="form-body">
+
+      <div class="section-label">Your Location</div>
+
+      <div class="field">
+        <label>Franchise brand</label>
+        <select id="brand">
+          <option value="wavemax">WaveMAX Laundry</option>
+          <option value="trublue" disabled>TruBlue Home Services (coming soon)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Your franchise address</label>
+        <input type="text" id="address" placeholder="e.g. 2525 Jackson Keller Rd, San Antonio, TX 78230"
+          value="2525 Jackson Keller Rd, San Antonio, TX 78230"/>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label>Number of washers</label>
+          <input type="number" id="washers" placeholder="e.g. 24" min="1" value=""/>
+        </div>
+        <div class="field">
+          <label>Number of dryers</label>
+          <input type="number" id="dryers" placeholder="e.g. 24" min="1" value=""/>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Approximate monthly revenue <span class="opt">(optional — helps calibrate targets)</span></label>
+        <select id="revenue">
+          <option value="">Prefer not to say</option>
+          <option value="under10k">Under $10,000</option>
+          <option value="10-20k">$10,000 – $20,000</option>
+          <option value="20-40k">$20,000 – $40,000</option>
+          <option value="40-60k">$40,000 – $60,000</option>
+          <option value="over60k">Over $60,000</option>
+        </select>
+      </div>
+
+      <div class="section-label">Your Growth Profile</div>
+
+      <div class="field">
+        <label>Biggest growth challenges <span class="opt">(select all that apply)</span></label>
+        <div class="chip-group" id="challenges">
+          <div class="chip" onclick="toggleChip(this,'challenges')">Walk-in traffic</div>
+          <div class="chip" onclick="toggleChip(this,'challenges')">Commercial accounts</div>
+          <div class="chip" onclick="toggleChip(this,'challenges')">Apartment outreach</div>
+          <div class="chip" onclick="toggleChip(this,'challenges')">Online reputation</div>
+          <div class="chip" onclick="toggleChip(this,'challenges')">Wash &amp; fold volume</div>
+          <div class="chip" onclick="toggleChip(this,'challenges')">Weekday traffic</div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>How do you currently market? <span class="opt">(select all that apply)</span></label>
+        <div class="chip-group" id="marketing">
+          <div class="chip" onclick="toggleChip(this,'marketing')">Google Business Profile</div>
+          <div class="chip" onclick="toggleChip(this,'marketing')">Social media</div>
+          <div class="chip" onclick="toggleChip(this,'marketing')">Corporate program</div>
+          <div class="chip" onclick="toggleChip(this,'marketing')">Word of mouth only</div>
+          <div class="chip" onclick="toggleChip(this,'marketing')">Flyers / print</div>
+          <div class="chip" onclick="toggleChip(this,'marketing')">Nothing formal yet</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="cta-wrap">
+        <button class="cta-btn" id="submit-btn" onclick="handleSubmit()">
+          Generate my Market Growth Strategy &nbsp;→
+        </button>
+        <div class="cta-sub">Free during beta · Full report delivered on next page</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Deliverables -->
+  <div style="margin-bottom: 16px;" class="section-header">What's included in your report package</div>
+  <div class="deliverables-grid">
+    <div class="deliverable">
+      <div class="del-icon">📊</div>
+      <div>
+        <div class="del-title">Market Research Brief</div>
+        <div class="del-desc">Demographics, competitor landscape, apartment ecosystem & reputation audit</div>
+      </div>
+    </div>
+    <div class="deliverable">
+      <div class="del-icon">📋</div>
+      <div>
+        <div class="del-title">Marketing Action Plan</div>
+        <div class="del-desc">Prioritized tactics, budget allocation & 90-day checklist</div>
+      </div>
+    </div>
+    <div class="deliverable">
+      <div class="del-icon">🎯</div>
+      <div>
+        <div class="del-title">Commercial Target List</div>
+        <div class="del-desc">Nearby businesses by category with revenue projections & pitch strategy</div>
+      </div>
+    </div>
+    <div class="deliverable">
+      <div class="del-icon">📄</div>
+      <div>
+        <div class="del-title">Print-Ready Collateral</div>
+        <div class="del-desc">Commercial one-pager & apartment door hanger, ready to print</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggleChip(el, group) {
+    el.classList.toggle('selected');
+  }
+
+  function getSelectedChips(groupId) {
+    return Array.from(document.querySelectorAll('#' + groupId + ' .chip.selected'))
+      .map(function(c) { return c.textContent.trim(); });
+  }
+
+  function handleSubmit() {
+    var address = document.getElementById('address').value.trim();
+    var brand = document.getElementById('brand').value;
+
+    if (!address) {
+      alert('Please enter your franchise address.');
+      return;
+    }
+
+    var formData = {
+      brand: brand,
+      address: address,
+      washers: document.getElementById('washers').value || null,
+      dryers: document.getElementById('dryers').value || null,
+      revenue: document.getElementById('revenue').value || null,
+      challenges: getSelectedChips('challenges'),
+      marketing: getSelectedChips('marketing')
+    };
+
+    // Store form data for report page
+    try {
+      localStorage.setItem('fiq_form_data', JSON.stringify(formData));
+    } catch(e) {}
+
+    // Navigate to report page
+    window.location.href = '/report';
+  }
+</script>
+</body>
+</html>
 
