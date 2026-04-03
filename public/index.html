@@ -547,6 +547,18 @@
         </select>
       </div>
 
+      <div class="field">
+        <label>Monthly marketing budget <span class="opt">(helps calibrate recommendations)</span></label>
+        <select id="budget">
+          <option value="">Not sure yet</option>
+          <option value="under100">Under $100/month</option>
+          <option value="100-250">$100 – $250/month</option>
+          <option value="250-500">$250 – $500/month</option>
+          <option value="500-1000">$500 – $1,000/month</option>
+          <option value="over1000">Over $1,000/month</option>
+        </select>
+      </div>
+
       <div class="section-label">Your Growth Profile</div>
 
       <div class="field">
@@ -645,6 +657,7 @@
       washers: document.getElementById('washers').value || null,
       dryers: document.getElementById('dryers').value || null,
       revenue: document.getElementById('revenue').value || null,
+      budget: document.getElementById('budget').value || null,
       challenges: getSelectedChips('challenges'),
       marketing: getSelectedChips('marketing')
     };
