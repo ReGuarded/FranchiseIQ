@@ -259,6 +259,14 @@ When Census demographics are provided, weave them into the narrative:
 - Median income calibrates pricing sensitivity and wash & fold potential
 - Population density anchors market size estimates
 
+When a monthly marketing budget is provided, calibrate ALL recommendations to that budget:
+- Under $100/month: focus entirely on zero-cost tactics (in-person outreach, door hangers, Google Business Profile)
+- $100-$250/month: add minimal print materials and basic social media
+- $250-$500/month: include Google Ads, door hanger printing, and targeted outreach
+- $500-$1,000/month: full digital + print + commercial outreach program
+- Over $1,000/month: aggressive multi-channel strategy with paid advertising
+Never recommend spending more than the stated budget. The budget breakdown in the report must sum to the stated budget range.
+
 For commercial targets, use distance data to sequence outreach logically:
 - Same block or walking distance = Week 1, zero budget, walk over and introduce yourself
 - Under 1 mile = Month 1 canvassing run with printed materials
@@ -271,6 +279,16 @@ You always output structured JSON. Every text field must contain rich, specific,
       const marketingText = formData.marketing && formData.marketing.length > 0
         ? formData.marketing.join(', ') : 'Not specified';
       const revenueText = formData.revenue || 'Not provided';
+
+      // Map budget code to readable label
+      var budgetLabels = {
+        'under100': 'Under $100/month',
+        '100-250': '$100 – $250/month',
+        '250-500': '$250 – $500/month',
+        '500-1000': '$500 – $1,000/month',
+        'over1000': 'Over $1,000/month'
+      };
+      const budgetText = formData.budget ? (budgetLabels[formData.budget] || formData.budget) : 'Not specified — use conservative $200-300/month assumption';
 
       function summarizePlaces(category) {
         if (!research[category] || !research[category].results || research[category].results.length === 0) {
@@ -350,6 +368,7 @@ OWNER-PROVIDED CONTEXT:
 - Monthly revenue range: ${revenueText}
 - Biggest growth challenges: ${challengesText}
 - Current marketing activities: ${marketingText}
+- Monthly marketing budget: ${budgetText}
 `;
 
       const userPrompt = `Analyze this WaveMAX Laundry franchise location. Use the review text to identify specific competitor weaknesses and apartment frustration signals. Use Census demographics to anchor the neighborhood analysis. Use distances to sequence commercial outreach realistically.
