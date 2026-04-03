@@ -888,6 +888,7 @@
   }
 
   function renderReport(report) {
+    var store = report.storeProfile || {};
     var loc = report.locationSummary || {};
     var mkt = report.marketResearch || {};
     var demo = mkt.demographics || {};
@@ -904,6 +905,34 @@
     var doorHanger = collateral.doorHanger || {};
 
     var html = '';
+
+    // ── Store Profile Section ──
+    if (store.headline || store.rating) {
+      html += '<div class="section-card fade-in" style="margin-bottom:20px;">';
+      html += '<div class="section-card-header"><div class="section-icon">🏪</div><div><div class="section-title">Your Store Profile</div><div class="section-subtitle">Your current competitive position in this market</div></div></div>';
+      html += '<div class="section-body">';
+      if (store.headline) html += '<div class="summary-text" style="font-weight:500;color:var(--navy-deep);">' + store.headline + '</div>';
+      html += '<div class="demo-grid" style="margin-top:14px;">';
+      if (store.rating) html += '<div class="demo-stat"><div class="demo-value" style="color:var(--gold);">★ ' + store.rating + '</div><div class="demo-label">Google Rating</div></div>';
+      if (store.reviewCount) html += '<div class="demo-stat"><div class="demo-value">' + store.reviewCount + '</div><div class="demo-label">Google Reviews</div></div>';
+      if (store.washers || store.dryers) html += '<div class="demo-stat"><div class="demo-value">' + safe(store.washers,'?') + '/' + safe(store.dryers,'?') + '</div><div class="demo-label">Washers/Dryers</div></div>';
+      html += '</div>';
+      if (store.ratingContext) {
+        html += '<div class="sub-label">Rating vs. Market</div>';
+        html += '<div style="background:var(--gold-pale);border-radius:var(--radius-sm);padding:14px 16px;font-size:13px;color:var(--text-2);line-height:1.65;border:1px solid rgba(201,131,42,0.2);">' + store.ratingContext + '</div>';
+      }
+      if (store.strengthSummary) {
+        html += '<div class="sub-label">Current Strengths</div>';
+        html += '<div class="summary-text">' + store.strengthSummary + '</div>';
+      }
+      if (store.immediateOpportunity) {
+        html += '<div style="background:var(--navy);border-radius:var(--radius-sm);padding:14px 16px;margin-top:14px;">';
+        html += '<div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:6px;">Your #1 Priority This Week</div>';
+        html += '<div style="font-size:13px;font-weight:500;color:var(--gold-light);">⚡ ' + store.immediateOpportunity + '</div>';
+        html += '</div>';
+      }
+      html += '</div></div>';
+    }
 
     // ── Report Header ──
     html += '<div class="report-header fade-in">';
@@ -1000,6 +1029,7 @@
         html += '</div>';
         html += '<div class="target-address">' + safe(t.address) + '</div>';
         if (t.rating) html += '<div style="font-size:11px;color:var(--gold);margin-top:2px;">★ ' + t.rating + ' (' + (t.reviewCount || 0) + ' reviews)</div>';
+        if (t.laundryFrustration) html += '<div style="font-size:11.5px;color:var(--danger,#c0392b);margin-top:3px;font-style:italic;">⚠ ' + t.laundryFrustration + '</div>';
         if (t.reason) html += '<div class="target-reason">' + t.reason + '</div>';
         html += '</div>';
         html += '<span class="priority-badge ' + priorityClass(t.priority) + '">' + safe(t.priority) + '</span>';
@@ -1014,8 +1044,15 @@
       html += '<div class="section-card fade-in">';
       html += '<div class="section-card-header"><div class="section-icon">⭐</div><div><div class="section-title">Reputation & Online Presence</div><div class="section-subtitle">Google Business Profile & review strategy</div></div></div>';
       html += '<div class="section-body">';
+      if (rep.currentRating || rep.reviewCount) {
+        html += '<div style="display:flex;gap:12px;margin-bottom:14px;">';
+        if (rep.currentRating) html += '<div class="demo-stat" style="flex:1;"><div class="demo-value" style="color:var(--gold);">★ ' + rep.currentRating + '</div><div class="demo-label">Your Rating</div></div>';
+        if (rep.reviewCount) html += '<div class="demo-stat" style="flex:1;"><div class="demo-value">' + rep.reviewCount + '</div><div class="demo-label">Your Reviews</div></div>';
+        html += '</div>';
+      }
+      if (rep.ratingVsMarket) html += '<div style="background:var(--gold-pale);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:14px;border:1px solid rgba(201,131,42,0.2);">' + rep.ratingVsMarket + '</div>';
       if (rep.currentStrength) html += '<div class="summary-text">' + rep.currentStrength + '</div>';
-      html += '<div class="sub-label">Action Items</div>';
+      html += '<div class="sub-label">Tactical Action Items</div>';
       html += '<div class="rec-list">';
       rep.recommendations.forEach(function(r, i) {
         html += '<div class="rec-item"><div class="rec-num">' + (i + 1) + '</div><span>' + r + '</span></div>';
