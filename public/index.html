@@ -526,6 +526,17 @@
 
       <div class="field-row">
         <div class="field">
+          <label>Your Google rating <span class="opt">(e.g. 4.8)</span></label>
+          <input type="number" id="googleRating" placeholder="e.g. 4.8" min="1" max="5" step="0.1"/>
+        </div>
+        <div class="field">
+          <label>Number of Google reviews</label>
+          <input type="number" id="reviewCount" placeholder="e.g. 280" min="0"/>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
           <label>Number of washers</label>
           <input type="number" id="washers" placeholder="e.g. 24" min="1" value=""/>
         </div>
@@ -654,6 +665,8 @@
     var formData = {
       brand: brand,
       address: address,
+      googleRating: document.getElementById('googleRating').value || null,
+      reviewCount: document.getElementById('reviewCount').value || null,
       washers: document.getElementById('washers').value || null,
       dryers: document.getElementById('dryers').value || null,
       revenue: document.getElementById('revenue').value || null,
