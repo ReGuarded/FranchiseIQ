@@ -1,5 +1,5 @@
-// FranchiseIQ v1.1 — API handler
-// Upgrades: review text from Places API, Census demographics, distance calculations, richer synthesis prompt
+// FranchiseIQ v1.2 — API handler
+// Upgrades: store profile section, tighter radii, more apartment results, min 5 competitors, stronger reputation prompt
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -35,7 +35,7 @@ module.exports = async function handler(req, res) {
       const lng = geoData.results[0].geometry.location.lng;
       const formattedAddress = geoData.results[0].formatted_address;
 
-      // Extract zip code from geocode result for Census lookup
+      // Extract zip code for Census lookup
       var zipCode = null;
       var addressComponents = geoData.results[0].address_components || [];
       for (var i = 0; i < addressComponents.length; i++) {
@@ -45,7 +45,7 @@ module.exports = async function handler(req, res) {
         }
       }
 
-      // ── HELPER: Calculate distance in miles between two lat/lng points ──
+      // ── HELPER: Distance in miles ──
       function distanceMiles(lat1, lng1, lat2, lng2) {
         if (!lat1 || !lng1 || !lat2 || !lng2) return null;
         var R = 3958.8;
@@ -65,35 +65,24 @@ module.exports = async function handler(req, res) {
         return miles + ' miles away';
       }
 
-      // Step 2: Fetch Census demographic data for zip code
+      // ── Census demographics ──
       async function fetchCensusData(zip) {
         if (!zip) return null;
         try {
           var censusUrl = 'https://api.census.gov/data/2022/acs/acs5?get=' +
-            'B01003_001E,' +
-            'B25003_003E,' +
-            'B25003_001E,' +
-            'B19013_001E,' +
-            'B25064_001E,' +
-            'B01002_001E,' +
-            'B25035_001E' +
+            'B01003_001E,B25003_003E,B25003_001E,B19013_001E,B25064_001E,B01002_001E,B25035_001E' +
             '&for=zip%20code%20tabulation%20area:' + zip;
-
           var censusRes = await fetch(censusUrl);
           var censusData = await censusRes.json();
-
           if (!censusData || censusData.length < 2) return null;
-
           var headers = censusData[0];
           var values = censusData[1];
-
           function getVal(varName) {
             var idx = headers.indexOf(varName);
             if (idx === -1) return null;
             var v = parseInt(values[idx]);
             return isNaN(v) || v < 0 ? null : v;
           }
-
           var totalPop = getVal('B01003_001E');
           var renterUnits = getVal('B25003_003E');
           var totalUnits = getVal('B25003_001E');
@@ -101,9 +90,7 @@ module.exports = async function handler(req, res) {
           var medianRent = getVal('B25064_001E');
           var medianAge = getVal('B01002_001E');
           var medianYearBuilt = getVal('B25035_001E');
-
           var renterPct = (renterUnits && totalUnits) ? Math.round((renterUnits / totalUnits) * 100) : null;
-
           return {
             zip: zip,
             totalPopulation: totalPop,
@@ -115,24 +102,25 @@ module.exports = async function handler(req, res) {
             housingEra: medianYearBuilt ? (medianYearBuilt < 1980 ? '1960s-1970s (older stock, fewer in-unit hookups)' :
               medianYearBuilt < 1995 ? '1980s-1990s (mixed-age stock)' : '1990s-2000s (newer stock)') : null
           };
-        } catch(e) {
-          return null;
-        }
+        } catch(e) { return null; }
       }
 
-      // Step 3: Run all location searches in parallel
+      // ── Search config — tightened radii ──
+      // Apartments: 3200m (2 miles), fetch top 20 then sort by distance
+      // Competitors: 5000m (3 miles)
+      // All commercial: 3200m (2 miles)
       const searches = [
-        { key: 'competitors',  query: 'laundromat coin laundry wash fold',     radius: 8000, label: 'Direct Competitors' },
-        { key: 'apartments',   query: 'apartment complex',                      radius: 6000, label: 'Apartment Complexes' },
-        { key: 'hotels',       query: 'hotel motel inn suites',                 radius: 8000, label: 'Hotels & Motels' },
-        { key: 'gyms',         query: 'gym fitness center boxing martial arts', radius: 5000, label: 'Gyms & Fitness Centers' },
-        { key: 'medical',      query: 'medical clinic dental urgent care',      radius: 6000, label: 'Medical & Dental' },
-        { key: 'restaurants',  query: 'restaurant cafe food service',           radius: 4000, label: 'Restaurants & Food Service' },
-        { key: 'salons',       query: 'hair salon nail spa beauty',             radius: 4000, label: 'Salons & Spas' },
-        { key: 'automotive',   query: 'auto repair mechanic shop',              radius: 5000, label: 'Auto Repair Shops' }
+        { key: 'competitors',  query: 'laundromat coin laundry wash fold',      radius: 5000, maxResults: 8,  label: 'Direct Competitors' },
+        { key: 'apartments',   query: 'apartment complex',                       radius: 3200, maxResults: 20, label: 'Apartment Complexes' },
+        { key: 'hotels',       query: 'hotel motel inn suites',                  radius: 3200, maxResults: 8,  label: 'Hotels & Motels' },
+        { key: 'gyms',         query: 'gym fitness center boxing martial arts',  radius: 3200, maxResults: 8,  label: 'Gyms & Fitness Centers' },
+        { key: 'medical',      query: 'medical clinic dental urgent care',       radius: 3200, maxResults: 8,  label: 'Medical & Dental' },
+        { key: 'restaurants',  query: 'restaurant cafe food service',            radius: 3200, maxResults: 8,  label: 'Restaurants & Food Service' },
+        { key: 'salons',       query: 'hair salon nail spa beauty',              radius: 3200, maxResults: 8,  label: 'Salons & Spas' },
+        { key: 'automotive',   query: 'auto repair mechanic shop',               radius: 3200, maxResults: 8,  label: 'Auto Repair Shops' }
       ];
 
-      async function searchPlaces(searchQuery, searchRadius) {
+      async function searchPlaces(searchQuery, searchRadius, maxResults) {
         const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' +
           lat + ',' + lng +
           '&radius=' + searchRadius +
@@ -142,12 +130,12 @@ module.exports = async function handler(req, res) {
         const placesRes = await fetch(url);
         const placesData = await placesRes.json();
 
-        if (!placesData.results || placesData.results.length === 0) {
-          return [];
-        }
+        if (!placesData.results || placesData.results.length === 0) return [];
 
-        const top6 = placesData.results.slice(0, 6);
-        const detailed = await Promise.all(top6.map(async function(place) {
+        // Take up to maxResults before fetching details
+        const topN = placesData.results.slice(0, maxResults);
+
+        const detailed = await Promise.all(topN.map(async function(place) {
           try {
             const detailUrl = 'https://maps.googleapis.com/maps/api/place/details/json?place_id=' +
               place.place_id +
@@ -199,6 +187,7 @@ module.exports = async function handler(req, res) {
           }
         }));
 
+        // Sort by distance — closest first
         return detailed.sort(function(a, b) {
           var dA = a.distanceMiles !== null ? a.distanceMiles : 999;
           var dB = b.distanceMiles !== null ? b.distanceMiles : 999;
@@ -206,11 +195,11 @@ module.exports = async function handler(req, res) {
         });
       }
 
-      // Run Places searches + Census lookup in parallel
+      // Run all searches + Census in parallel
       const [placesResults, censusData] = await Promise.all([
         Promise.all(
           searches.map(function(s) {
-            return searchPlaces(s.query, s.radius).then(function(data) {
+            return searchPlaces(s.query, s.radius, s.maxResults).then(function(data) {
               return { key: s.key, label: s.label, data: data };
             });
           })
@@ -247,17 +236,35 @@ Your analysis must be:
 - HONEST: Name real competitive threats. Do not sugarcoat weaknesses.
 - CONSULTANT-GRADE: Your tone should feel like a senior market brief, not a marketing brochure
 
-When review text is provided for competitors or apartment complexes, mine it aggressively:
-- Quote or reference specific complaints to identify competitor weaknesses
-- Identify frustrated apartment residents as warm leads
-- Look for payment friction, cleanliness failures, or staff issues in reviews
-- Use review signals to calibrate threat levels and pitch angles for commercial targets
+STORE PROFILE SECTION — Always lead with the owner's own business:
+- Use their Google rating and review count to establish their market position
+- Compare their rating directly against named competitors
+- If their rating is 4.5+ they are likely the highest-rated laundromat in their market — say so
+- Frame the store profile as "here is your current competitive position" before analyzing the market around them
+- Revenue range (if provided) helps calibrate the scale of opportunity
+
+APARTMENT TARGETING — Critical instructions:
+- Prioritize complexes that are CLOSEST first — walking distance and same-block complexes are the highest priority
+- Low-rated complexes (under 3.5 stars) with laundry complaints in reviews are HIGHEST priority targets
+- A 3.0-star apartment complex directly across the street is worth more than a 4.5-star complex 1.5 miles away
+- Mine review text aggressively for phrases like "broken machines", "laundry", "maintenance", "washer" — these signal frustrated residents who are warm leads
+- Always list at least 5 apartment complexes if the data provides them
+
+COMPETITOR ANALYSIS — Always include at least 5 competitors if data is available:
+- Reference specific weaknesses found in their actual review text
+- Coin-only payment, dirty facilities, theft complaints, unreliable hours are all exploitable weaknesses
+- Quantify the threat: how many reviews do they have, how far are they, what is their rating trend
+
+REPUTATION SECTION — This must be specific to the owner's actual Google position:
+- Reference their actual rating and review count provided in the form
+- Compare directly: "Your 4.8-star rating outperforms every competitor in this analysis"
+- Give specific, tactical advice: how to respond to reviews, how to ask for new ones, what to post on Google Business Profile
+- If their rating is exceptional, position it as a marketing asset to activate immediately
 
 When Census demographics are provided, weave them into the narrative:
 - Renter percentage above 45% is a strong laundromat demand signal — call it out
 - Housing era before 1980 means very few in-unit washer/dryer hookups — this is a structural advantage
 - Median income calibrates pricing sensitivity and wash & fold potential
-- Population density anchors market size estimates
 
 When a monthly marketing budget is provided, calibrate ALL recommendations to that budget:
 - Under $100/month: focus entirely on zero-cost tactics (in-person outreach, door hangers, Google Business Profile)
@@ -265,12 +272,12 @@ When a monthly marketing budget is provided, calibrate ALL recommendations to th
 - $250-$500/month: include Google Ads, door hanger printing, and targeted outreach
 - $500-$1,000/month: full digital + print + commercial outreach program
 - Over $1,000/month: aggressive multi-channel strategy with paid advertising
-Never recommend spending more than the stated budget. The budget breakdown in the report must sum to the stated budget range.
+Never recommend spending more than the stated budget. The budget breakdown must sum to the stated budget range.
 
-For commercial targets, use distance data to sequence outreach logically:
+For commercial targets, use distance data to sequence outreach:
 - Same block or walking distance = Week 1, zero budget, walk over and introduce yourself
 - Under 1 mile = Month 1 canvassing run with printed materials
-- 1-3 miles = Month 2 with more targeted outreach
+- 1-2 miles = Month 2 with targeted outreach
 
 You always output structured JSON. Every text field must contain rich, specific, consultant-quality prose — never placeholder language.`;
 
@@ -280,7 +287,6 @@ You always output structured JSON. Every text field must contain rich, specific,
         ? formData.marketing.join(', ') : 'Not specified';
       const revenueText = formData.revenue || 'Not provided';
 
-      // Map budget code to readable label
       var budgetLabels = {
         'under100': 'Under $100/month',
         '100-250': '$100 – $250/month',
@@ -288,7 +294,9 @@ You always output structured JSON. Every text field must contain rich, specific,
         '500-1000': '$500 – $1,000/month',
         'over1000': 'Over $1,000/month'
       };
-      const budgetText = formData.budget ? (budgetLabels[formData.budget] || formData.budget) : 'Not specified — use conservative $200-300/month assumption';
+      const budgetText = formData.budget
+        ? (budgetLabels[formData.budget] || formData.budget)
+        : 'Not specified — use conservative $200-300/month assumption';
 
       function summarizePlaces(category) {
         if (!research[category] || !research[category].results || research[category].results.length === 0) {
@@ -334,55 +342,75 @@ You always output structured JSON. Every text field must contain rich, specific,
 FRANCHISE LOCATION: ${research.address}
 ZIP CODE: ${research.zipCode || 'N/A'}
 
-NEIGHBORHOOD DEMOGRAPHICS (US Census ACS Data):
-${demoSection}
-
-DIRECT COMPETITORS — sorted by distance:
-${summarizePlaces('competitors')}
-
-APARTMENT COMPLEXES NEARBY — sorted by distance:
-${summarizePlaces('apartments')}
-
-HOTELS & MOTELS NEARBY:
-${summarizePlaces('hotels')}
-
-GYMS & FITNESS CENTERS NEARBY:
-${summarizePlaces('gyms')}
-
-MEDICAL & DENTAL NEARBY:
-${summarizePlaces('medical')}
-
-RESTAURANTS & FOOD SERVICE NEARBY:
-${summarizePlaces('restaurants')}
-
-SALONS & SPAS NEARBY:
-${summarizePlaces('salons')}
-
-AUTO REPAIR SHOPS NEARBY:
-${summarizePlaces('automotive')}
-
-OWNER-PROVIDED CONTEXT:
+OWNER'S STORE PROFILE:
 - Franchise brand: ${formData.brand === 'wavemax' ? 'WaveMAX Laundry' : formData.brand}
 - Number of washers: ${formData.washers || 'Not provided'}
 - Number of dryers: ${formData.dryers || 'Not provided'}
+- Owner's Google rating: ${formData.googleRating || 'Not provided'}
+- Owner's Google review count: ${formData.reviewCount || 'Not provided'}
 - Monthly revenue range: ${revenueText}
+- Monthly marketing budget: ${budgetText}
 - Biggest growth challenges: ${challengesText}
 - Current marketing activities: ${marketingText}
-- Monthly marketing budget: ${budgetText}
+
+NEIGHBORHOOD DEMOGRAPHICS (US Census ACS Data):
+${demoSection}
+
+DIRECT COMPETITORS — sorted by distance (minimum 5 required in output):
+${summarizePlaces('competitors')}
+
+APARTMENT COMPLEXES NEARBY — sorted by distance, closest first (minimum 5 required in output):
+${summarizePlaces('apartments')}
+
+HOTELS & MOTELS NEARBY (within 2 miles):
+${summarizePlaces('hotels')}
+
+GYMS & FITNESS CENTERS NEARBY (within 2 miles):
+${summarizePlaces('gyms')}
+
+MEDICAL & DENTAL NEARBY (within 2 miles):
+${summarizePlaces('medical')}
+
+RESTAURANTS & FOOD SERVICE NEARBY (within 2 miles):
+${summarizePlaces('restaurants')}
+
+SALONS & SPAS NEARBY (within 2 miles):
+${summarizePlaces('salons')}
+
+AUTO REPAIR SHOPS NEARBY (within 2 miles):
+${summarizePlaces('automotive')}
 `;
 
-      const userPrompt = `Analyze this WaveMAX Laundry franchise location. Use the review text to identify specific competitor weaknesses and apartment frustration signals. Use Census demographics to anchor the neighborhood analysis. Use distances to sequence commercial outreach realistically.
+      const userPrompt = `Analyze this WaveMAX Laundry franchise location and generate a complete Market Growth Strategy Report.
+
+Key instructions:
+1. Open with a "Store Profile" section that establishes the owner's current competitive position using their Google rating vs competitors
+2. List ALL apartment complexes provided — minimum 5 — prioritized by proximity AND laundry frustration signals from reviews
+3. List minimum 5 competitors with specific weaknesses from their review text
+4. Reputation section must reference the owner's actual rating and give specific tactical advice
+5. All budget recommendations must fit within the stated monthly budget
 
 ${researchSummary}
 
-Return ONLY a valid JSON object with this exact structure. Every text field must be specific, data-grounded, and consultant-quality:
+Return ONLY a valid JSON object — no markdown, no preamble:
 
 {
+  "storeProfile": {
+    "headline": "One sentence establishing this owner's current market position — reference their actual rating vs competitors",
+    "rating": "X.X",
+    "reviewCount": "XXX",
+    "ratingContext": "2-3 sentences comparing their rating to the named competitors found in this market — is it the highest? By how much?",
+    "revenueRange": "as provided",
+    "washers": "as provided",
+    "dryers": "as provided",
+    "strengthSummary": "2-3 sentences on what this location already has going for it before any marketing investment",
+    "immediateOpportunity": "The single most important thing this owner should do in the next 7 days"
+  },
   "locationSummary": {
-    "headline": "One sharp specific sentence capturing this location's biggest opportunity — reference real data",
-    "overview": "3-4 sentence narrative grounded in actual demographics and competitive data — reference renter percentage, housing era, and competitor landscape by name",
+    "headline": "One sharp specific sentence capturing this location's biggest market opportunity",
+    "overview": "3-4 sentence narrative grounded in actual demographics and competitive data",
     "opportunityScore": 85,
-    "topOpportunity": "The single highest-revenue opportunity based on what the data actually shows"
+    "topOpportunity": "The single highest-revenue opportunity based on what the data shows"
   },
   "marketResearch": {
     "demographics": {
@@ -390,11 +418,11 @@ Return ONLY a valid JSON object with this exact structure. Every text field must
       "renterPercentage": "XX%",
       "totalPopulation": "XX,XXX",
       "medianIncome": "$XX,XXX",
-      "housingEra": "description of housing era and what it means for hookup scarcity",
-      "keyInsight": "2-3 sentences on what these specific numbers mean for laundromat demand at this address"
+      "housingEra": "description",
+      "keyInsight": "2-3 sentences on what these numbers mean for laundromat demand at this specific address"
     },
     "competitorAnalysis": {
-      "summary": "3-4 sentences referencing specific competitor names, their actual ratings, and weaknesses from their reviews",
+      "summary": "3-4 sentences referencing specific competitor names, ratings, and weaknesses from reviews",
       "competitors": [
         {
           "name": "exact name",
@@ -403,42 +431,51 @@ Return ONLY a valid JSON object with this exact structure. Every text field must
           "rating": 4.2,
           "reviewCount": 180,
           "threat": "High/Medium/Low",
-          "weakness": "Specific weakness from their actual review text",
-          "opportunityAngle": "How this creates an opening"
+          "weakness": "Specific weakness from their actual review text — quote or reference real complaints",
+          "opportunityAngle": "How this weakness creates an opening for this owner"
         }
       ],
-      "competitiveAdvantage": "2-3 sentences on WaveMAX specific advantages over the named competitors"
+      "competitiveAdvantage": "2-3 sentences on this owner's specific advantages over the named competitors"
     },
     "apartmentOpportunity": {
-      "summary": "3-4 sentences referencing specific complex names, ratings, and any laundry frustration signals from reviews",
-      "totalComplexes": 4,
-      "estimatedHouseholds": 800,
-      "monthlyLaundrySpend": "$16,000",
+      "summary": "3-4 sentences referencing specific complex names, ratings, distances, and laundry frustration signals from reviews",
+      "totalComplexes": 5,
+      "estimatedHouseholds": 1000,
+      "monthlyLaundrySpend": "$20,000",
       "topTargets": [
         {
           "name": "exact complex name",
           "address": "address",
           "distanceLabel": "X.X miles away",
           "priority": "High/Medium/Low",
-          "rating": 3.2,
-          "reviewCount": 180,
-          "reason": "Specific reason based on distance, review signals, or laundry frustration"
+          "rating": 3.0,
+          "reviewCount": 197,
+          "laundryFrustration": "Specific laundry complaint or frustration signal from reviews, or distance/proximity rationale",
+          "reason": "Why this complex is a priority target — be specific"
         }
       ]
     },
     "reputationAudit": {
-      "currentStrength": "Analysis of WaveMAX reputation position relative to named competitors",
-      "recommendations": ["action 1", "action 2", "action 3", "action 4"]
+      "currentRating": "X.X stars",
+      "reviewCount": "XXX reviews",
+      "ratingVsMarket": "Direct comparison: how this owner's rating compares to every named competitor",
+      "currentStrength": "2-3 sentences on what the rating means as a competitive asset",
+      "recommendations": [
+        "Specific tactical action 1 — e.g. how to respond to reviews, what to post, how to ask for reviews",
+        "Specific tactical action 2",
+        "Specific tactical action 3",
+        "Specific tactical action 4"
+      ]
     }
   },
   "marketingActionPlan": {
-    "summary": "2-3 sentences referencing specific market conditions — renter percentage, competitor weaknesses, apartment proximity",
+    "summary": "2-3 sentences referencing specific market conditions and the stated budget",
     "tactics": [
       {
         "rank": 1,
         "title": "Specific tactic name",
         "category": "Apartment Outreach / Commercial / Digital / In-Store",
-        "description": "3-4 sentences with specific business names, distances, and actionable steps from the research",
+        "description": "3-4 sentences with specific business names, distances, and actionable steps",
         "effort": "Low/Medium/High",
         "impact": "Low/Medium/High",
         "timeframe": "Week 1-2 / Month 1 / Ongoing",
@@ -446,13 +483,13 @@ Return ONLY a valid JSON object with this exact structure. Every text field must
       }
     ],
     "budgetAllocation": {
-      "total": "$XXX/month recommended",
+      "total": "Must match stated budget range",
       "breakdown": [
         {"category": "name", "amount": "$XX", "rationale": "specific rationale for this market"}
       ]
     },
     "checklist90Day": {
-      "week1_2": ["specific action naming real nearby businesses or complexes", "action 2", "action 3"],
+      "week1_2": ["specific action naming real nearby businesses", "action 2", "action 3"],
       "month1": ["action 1", "action 2", "action 3"],
       "month2": ["action 1", "action 2"],
       "month3": ["action 1", "action 2"]
@@ -463,8 +500,8 @@ Return ONLY a valid JSON object with this exact structure. Every text field must
     "totalEstimatedMonthlyRevenue": "$X,XXX-X,XXX",
     "outreachPhases": {
       "phase1": "Week 1 — name specific same-block or walking-distance targets",
-      "phase2": "Month 1 — describe under-1-mile canvassing targets by name and category",
-      "phase3": "Month 2 — describe 1-3 mile targets"
+      "phase2": "Month 1 — name under-1-mile canvassing targets by name and category",
+      "phase3": "Month 2 — describe 1-2 mile targets"
     },
     "targets": [
       {
@@ -474,21 +511,21 @@ Return ONLY a valid JSON object with this exact structure. Every text field must
         "distanceLabel": "X.X miles away",
         "priority": "High/Medium/Low",
         "estimatedMonthlyRevenue": "$XXX-XXX",
-        "pitchAngle": "Specific pitch referencing what this business does and their laundry needs — use review signals if available",
-        "bestApproachTime": "When and how to approach this specific business type"
+        "pitchAngle": "Specific pitch referencing this business type and laundry needs — use review signals if available",
+        "bestApproachTime": "When and how to approach this specific business"
       }
     ]
   },
   "collateral": {
     "onePager": {
       "headline": "Compelling commercial headline specific to this location",
-      "subheadline": "Supporting line referencing this location's actual strengths",
+      "subheadline": "Supporting line referencing actual strengths",
       "bulletPoints": ["benefit with specific detail", "benefit 2", "benefit 3", "benefit 4"],
       "callToAction": "Specific CTA",
       "contactPrompt": "How to reach out"
     },
     "doorHanger": {
-      "headline": "Attention-grabbing headline referencing proximity to these specific apartments",
+      "headline": "Headline referencing proximity to the closest apartment complexes",
       "offerLine": "Compelling offer for first-time residents",
       "bulletPoints": ["resident benefit 1", "resident benefit 2", "resident benefit 3"],
       "callToAction": "CTA with address reference"
@@ -512,7 +549,6 @@ Return ONLY a valid JSON object with this exact structure. Every text field must
       });
 
       const aiData = await aiRes.json();
-
       if (!aiRes.ok) {
         return res.status(aiRes.status).json({ error: aiData.error || 'AI API error' });
       }
@@ -531,7 +567,6 @@ Return ONLY a valid JSON object with this exact structure. Every text field must
       }
     }
 
-    // ── FALLBACK ──
     return res.status(400).json({ error: 'Unknown request type: ' + type });
 
   } catch(err) {
