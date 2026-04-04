@@ -105,22 +105,70 @@ module.exports = async function handler(req, res) {
         } catch(e) { return null; }
       }
 
+      // ── Step 2: Look up the owner's own Google Business Profile ──
+      async function fetchOwnerProfile(ownerLat, ownerLng) {
+        try {
+          // Search for the franchise location itself using its coordinates
+          const nearbyUrl = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' +
+            ownerLat + ',' + ownerLng +
+            '&radius=50' +
+            '&keyword=laundromat+laundry' +
+            '&key=' + GOOGLE_KEY;
+          const nearbyRes = await fetch(nearbyUrl);
+          const nearbyData = await nearbyRes.json();
+
+          if (!nearbyData.results || nearbyData.results.length === 0) return null;
+
+          // Take the closest result — should be the owner's own location
+          const ownPlace = nearbyData.results[0];
+          const detailUrl = 'https://maps.googleapis.com/maps/api/place/details/json?place_id=' +
+            ownPlace.place_id +
+            '&fields=name,rating,user_ratings_total,reviews,formatted_phone_number,opening_hours,website' +
+            '&key=' + GOOGLE_KEY;
+          const detailRes = await fetch(detailUrl);
+          const detailData = await detailRes.json();
+          const d = detailData.result || {};
+
+          var ownerReviews = [];
+          if (d.reviews && d.reviews.length > 0) {
+            ownerReviews = d.reviews.slice(0, 5).map(function(r) {
+              return {
+                rating: r.rating,
+                text: r.text ? r.text.substring(0, 300) : '',
+                authorName: r.author_name || ''
+              };
+            }).filter(function(r) { return r.text.length > 10; });
+          }
+
+          return {
+            name: d.name || ownPlace.name,
+            rating: d.rating || ownPlace.rating || null,
+            reviewCount: d.user_ratings_total || ownPlace.user_ratings_total || 0,
+            phone: d.formatted_phone_number || null,
+            website: d.website || null,
+            reviews: ownerReviews
+          };
+        } catch(e) {
+          return null;
+        }
+      }
+
       // ── Search config — tightened radii ──
       // Apartments: 3200m (2 miles), fetch top 20 then sort by distance
       // Competitors: 5000m (3 miles)
       // All commercial: 3200m (2 miles)
       const searches = [
-        { key: 'competitors',  query: 'laundromat coin laundry wash fold',      radius: 5000, maxResults: 8,  label: 'Direct Competitors' },
-        { key: 'apartments',   query: 'apartment complex',                       radius: 3200, maxResults: 20, label: 'Apartment Complexes' },
-        { key: 'hotels',       query: 'hotel motel inn suites',                  radius: 3200, maxResults: 8,  label: 'Hotels & Motels' },
-        { key: 'gyms',         query: 'gym fitness center boxing martial arts',  radius: 3200, maxResults: 8,  label: 'Gyms & Fitness Centers' },
-        { key: 'medical',      query: 'medical clinic dental urgent care',       radius: 3200, maxResults: 8,  label: 'Medical & Dental' },
-        { key: 'restaurants',  query: 'restaurant cafe food service',            radius: 3200, maxResults: 8,  label: 'Restaurants & Food Service' },
-        { key: 'salons',       query: 'hair salon nail spa beauty',              radius: 3200, maxResults: 8,  label: 'Salons & Spas' },
-        { key: 'automotive',   query: 'auto repair mechanic shop',               radius: 3200, maxResults: 8,  label: 'Auto Repair Shops' }
+        { key: 'competitors',  query: 'laundromat coin laundry wash fold',      radius: 5000, maxResults: 8,  presort: false, label: 'Direct Competitors' },
+        { key: 'apartments',   query: 'apartment complex',                       radius: 3200, maxResults: 8,  presort: true,  label: 'Apartment Complexes' },
+        { key: 'hotels',       query: 'hotel motel inn suites',                  radius: 3200, maxResults: 6,  presort: false, label: 'Hotels & Motels' },
+        { key: 'gyms',         query: 'gym fitness center boxing martial arts',  radius: 3200, maxResults: 6,  presort: false, label: 'Gyms & Fitness Centers' },
+        { key: 'medical',      query: 'medical clinic dental urgent care',       radius: 3200, maxResults: 6,  presort: false, label: 'Medical & Dental' },
+        { key: 'restaurants',  query: 'restaurant cafe food service',            radius: 3200, maxResults: 6,  presort: false, label: 'Restaurants & Food Service' },
+        { key: 'salons',       query: 'hair salon nail spa beauty',              radius: 3200, maxResults: 6,  presort: false, label: 'Salons & Spas' },
+        { key: 'automotive',   query: 'auto repair mechanic shop',               radius: 3200, maxResults: 6,  presort: false, label: 'Auto Repair Shops' }
       ];
 
-      async function searchPlaces(searchQuery, searchRadius, maxResults) {
+      async function searchPlaces(searchQuery, searchRadius, maxResults, presort) {
         const url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' +
           lat + ',' + lng +
           '&radius=' + searchRadius +
@@ -132,8 +180,22 @@ module.exports = async function handler(req, res) {
 
         if (!placesData.results || placesData.results.length === 0) return [];
 
-        // Take up to maxResults before fetching details
-        const topN = placesData.results.slice(0, maxResults);
+        // For apartments: pre-sort by distance using coords already in Nearby Search response
+        // This finds closest complexes WITHOUT extra API calls, then fetches Details only for top N
+        var candidates = placesData.results;
+        if (presort) {
+          candidates = candidates.map(function(p) {
+            var pLat = p.geometry ? p.geometry.location.lat : null;
+            var pLng = p.geometry ? p.geometry.location.lng : null;
+            return { place: p, dist: distanceMiles(lat, lng, pLat, pLng) };
+          });
+          candidates.sort(function(a, b) {
+            return (a.dist !== null ? a.dist : 999) - (b.dist !== null ? b.dist : 999);
+          });
+          candidates = candidates.map(function(c) { return c.place; });
+        }
+
+        const topN = candidates.slice(0, maxResults);
 
         const detailed = await Promise.all(topN.map(async function(place) {
           try {
@@ -195,16 +257,17 @@ module.exports = async function handler(req, res) {
         });
       }
 
-      // Run all searches + Census in parallel
-      const [placesResults, censusData] = await Promise.all([
+      // Run all searches + Census + owner profile in parallel
+      const [placesResults, censusData, ownerProfile] = await Promise.all([
         Promise.all(
           searches.map(function(s) {
-            return searchPlaces(s.query, s.radius, s.maxResults).then(function(data) {
+            return searchPlaces(s.query, s.radius, s.maxResults, s.presort).then(function(data) {
               return { key: s.key, label: s.label, data: data };
             });
           })
         ),
-        fetchCensusData(zipCode)
+        fetchCensusData(zipCode),
+        fetchOwnerProfile(lat, lng)
       ]);
 
       const research = {
@@ -212,7 +275,8 @@ module.exports = async function handler(req, res) {
         lat: lat,
         lng: lng,
         zipCode: zipCode,
-        demographics: censusData
+        demographics: censusData,
+        ownerProfile: ownerProfile
       };
 
       placesResults.forEach(function(r) {
@@ -338,16 +402,40 @@ You always output structured JSON. Every text field must contain rich, specific,
         ].join('\n');
       }
 
+      // Format owner profile for prompt
+      var ownerProfileSection = 'Could not retrieve — use competitor data for context';
+      if (research.ownerProfile) {
+        var op = research.ownerProfile;
+        var ownerReviewText = '';
+        if (op.reviews && op.reviews.length > 0) {
+          ownerReviewText = '
+Owner Google Reviews (sample):
+' + op.reviews.map(function(r) {
+            return '  (' + r.rating + 'star) "' + r.text.substring(0, 200) + '"';
+          }).join('
+');
+        }
+        ownerProfileSection = [
+          'Business name: ' + (op.name || 'N/A'),
+          'Google Rating: ' + (op.rating ? op.rating + ' stars' : 'N/A'),
+          'Total Reviews: ' + (op.reviewCount || 'N/A'),
+          'Phone: ' + (op.phone || 'N/A'),
+          ownerReviewText
+        ].join('
+');
+      }
+
       const researchSummary = `
 FRANCHISE LOCATION: ${research.address}
 ZIP CODE: ${research.zipCode || 'N/A'}
 
-OWNER'S STORE PROFILE:
+OWNER'S GOOGLE BUSINESS PROFILE (auto-retrieved):
+${ownerProfileSection}
+
+OWNER-PROVIDED CONTEXT:
 - Franchise brand: ${formData.brand === 'wavemax' ? 'WaveMAX Laundry' : formData.brand}
 - Number of washers: ${formData.washers || 'Not provided'}
 - Number of dryers: ${formData.dryers || 'Not provided'}
-- Owner's Google rating: ${formData.googleRating || 'Not provided'}
-- Owner's Google review count: ${formData.reviewCount || 'Not provided'}
 - Monthly revenue range: ${revenueText}
 - Monthly marketing budget: ${budgetText}
 - Biggest growth challenges: ${challengesText}
@@ -573,4 +661,3 @@ Return ONLY a valid JSON object — no markdown, no preamble:
     return res.status(500).json({ error: { message: err.message, stack: err.stack } });
   }
 };
-
