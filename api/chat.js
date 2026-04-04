@@ -408,12 +408,9 @@ You always output structured JSON. Every text field must contain rich, specific,
         var op = research.ownerProfile;
         var ownerReviewText = '';
         if (op.reviews && op.reviews.length > 0) {
-          ownerReviewText = '
-Owner Google Reviews (sample):
-' + op.reviews.map(function(r) {
+          ownerReviewText = '\nOwner Google Reviews (sample):\n' + op.reviews.map(function(r) {
             return '  (' + r.rating + 'star) "' + r.text.substring(0, 200) + '"';
-          }).join('
-');
+          }).join('\n');
         }
         ownerProfileSection = [
           'Business name: ' + (op.name || 'N/A'),
@@ -421,8 +418,7 @@ Owner Google Reviews (sample):
           'Total Reviews: ' + (op.reviewCount || 'N/A'),
           'Phone: ' + (op.phone || 'N/A'),
           ownerReviewText
-        ].join('
-');
+        ].join('\n');
       }
 
       const researchSummary = `
