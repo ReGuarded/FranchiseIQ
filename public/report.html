@@ -1060,6 +1060,48 @@
     }
     html += '</div></div>';
 
+    // ── Section 5: Commercial Targets ──
+    html += '<div class="section-card fade-in">';
+    html += '<div class="section-card-header"><div class="section-icon">🎯</div><div><div class="section-title">Commercial Account Targets</div><div class="section-subtitle">Nearby businesses with wash & fold potential</div></div></div>';
+    html += '<div class="section-body">';
+    if (commercial.summary) html += '<div class="summary-text">' + commercial.summary + '</div>';
+    if (commercial.totalEstimatedMonthlyRevenue) {
+      html += '<div class="commercial-stats">';
+      html += '<div><div class="commercial-revenue">' + commercial.totalEstimatedMonthlyRevenue + '</div><div class="commercial-revenue-label">estimated monthly commercial revenue potential</div></div>';
+      html += '</div>';
+    }
+    if (phases.phase1 || phases.phase2 || phases.phase3) {
+      html += '<div class="sub-label">Outreach Sequence</div>';
+      html += '<div class="phase-grid">';
+      if (phases.phase1) html += '<div class="phase-card"><div class="phase-header">Phase 1 — Week 1</div><div class="phase-body">' + phases.phase1 + '</div></div>';
+      if (phases.phase2) html += '<div class="phase-card"><div class="phase-header">Phase 2 — Month 1</div><div class="phase-body">' + phases.phase2 + '</div></div>';
+      if (phases.phase3) html += '<div class="phase-card"><div class="phase-header">Phase 3 — Month 2</div><div class="phase-body">' + phases.phase3 + '</div></div>';
+      html += '</div>';
+    }
+    if (commercial.targets && commercial.targets.length > 0) {
+      html += '<div class="sub-label">Target Businesses</div>';
+      html += '<div class="commercial-list">';
+      commercial.targets.forEach(function(t) {
+        html += '<div class="commercial-card">';
+        html += '<div class="commercial-top">';
+        html += '<div>';
+        html += '<div class="commercial-name">' + safe(t.businessName);
+        if (t.distanceLabel) html += '<span class="distance-label">' + t.distanceLabel + '</span>';
+        html += '</div>';
+        html += '<div class="commercial-category">' + safe(t.category) + '</div>';
+        html += '</div>';
+        html += '<div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">';
+        if (t.estimatedMonthlyRevenue) html += '<span class="commercial-rev">' + t.estimatedMonthlyRevenue + '</span>';
+        html += '<span class="priority-badge ' + priorityClass(t.priority) + '">' + safe(t.priority) + '</span>';
+        html += '</div></div>';
+        if (t.pitchAngle) html += '<div class="commercial-pitch">' + t.pitchAngle + '</div>';
+        if (t.bestApproachTime) html += '<div class="approach-time">' + t.bestApproachTime + '</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    html += '</div></div>';
+
     // ── 8. Marketing Action Plan ──
     html += '<div class="section-card fade-in">';
     html += '<div class="section-card-header"><div class="section-icon">📋</div><div><div class="section-title">Marketing Action Plan</div><div class="section-subtitle">Prioritized tactics ranked by revenue impact</div></div></div>';
@@ -1125,47 +1167,7 @@
 
     html += '</div></div>';
 
-    // ── Section 5: Commercial Targets ──
-    html += '<div class="section-card fade-in">';
-    html += '<div class="section-card-header"><div class="section-icon">🎯</div><div><div class="section-title">Commercial Account Targets</div><div class="section-subtitle">Nearby businesses with wash & fold potential</div></div></div>';
-    html += '<div class="section-body">';
-    if (commercial.summary) html += '<div class="summary-text">' + commercial.summary + '</div>';
-    if (commercial.totalEstimatedMonthlyRevenue) {
-      html += '<div class="commercial-stats">';
-      html += '<div><div class="commercial-revenue">' + commercial.totalEstimatedMonthlyRevenue + '</div><div class="commercial-revenue-label">estimated monthly commercial revenue potential</div></div>';
-      html += '</div>';
-    }
-    if (phases.phase1 || phases.phase2 || phases.phase3) {
-      html += '<div class="sub-label">Outreach Sequence</div>';
-      html += '<div class="phase-grid">';
-      if (phases.phase1) html += '<div class="phase-card"><div class="phase-header">Phase 1 — Week 1</div><div class="phase-body">' + phases.phase1 + '</div></div>';
-      if (phases.phase2) html += '<div class="phase-card"><div class="phase-header">Phase 2 — Month 1</div><div class="phase-body">' + phases.phase2 + '</div></div>';
-      if (phases.phase3) html += '<div class="phase-card"><div class="phase-header">Phase 3 — Month 2</div><div class="phase-body">' + phases.phase3 + '</div></div>';
-      html += '</div>';
-    }
-    if (commercial.targets && commercial.targets.length > 0) {
-      html += '<div class="sub-label">Target Businesses</div>';
-      html += '<div class="commercial-list">';
-      commercial.targets.forEach(function(t) {
-        html += '<div class="commercial-card">';
-        html += '<div class="commercial-top">';
-        html += '<div>';
-        html += '<div class="commercial-name">' + safe(t.businessName);
-        if (t.distanceLabel) html += '<span class="distance-label">' + t.distanceLabel + '</span>';
-        html += '</div>';
-        html += '<div class="commercial-category">' + safe(t.category) + '</div>';
-        html += '</div>';
-        html += '<div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">';
-        if (t.estimatedMonthlyRevenue) html += '<span class="commercial-rev">' + t.estimatedMonthlyRevenue + '</span>';
-        html += '<span class="priority-badge ' + priorityClass(t.priority) + '">' + safe(t.priority) + '</span>';
-        html += '</div></div>';
-        if (t.pitchAngle) html += '<div class="commercial-pitch">' + t.pitchAngle + '</div>';
-        if (t.bestApproachTime) html += '<div class="approach-time">' + t.bestApproachTime + '</div>';
-        html += '</div>';
-      });
-      html += '</div>';
-    }
-    html += '</div></div>';
+
 
     // ── Section 6: Collateral ──
     if (onePager.headline || doorHanger.headline) {
@@ -1277,4 +1279,3 @@
 </script>
 </body>
 </html>
-
