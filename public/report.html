@@ -906,9 +906,29 @@
 
     var html = '';
 
-    // ── Store Profile Section ──
+    // ── 1. Report Header (blue) ──
+    html += '<div class="report-header fade-in">';
+    html += '<div class="report-header-top">';
+    html += '<div>';
+    html += '<div class="report-eyebrow">WaveMAX Laundry · Market Growth Strategy</div>';
+    html += '<div class="report-headline">' + safe(loc.headline, 'Your Market Growth Strategy') + '</div>';
+    html += '</div>';
+    if (loc.opportunityScore) {
+      html += '<div class="opportunity-badge"><div class="score">' + loc.opportunityScore + '</div><div class="score-label">Opportunity<br>Score</div></div>';
+    }
+    html += '</div>';
+    if (loc.overview) {
+      html += '<div class="report-overview">' + safe(loc.overview);
+      if (loc.topOpportunity) {
+        html += '<div class="top-opportunity">⚡ ' + safe(loc.topOpportunity) + '</div>';
+      }
+      html += '</div>';
+    }
+    html += '</div>';
+
+    // ── 2. Store Profile ──
     if (store.headline || store.rating) {
-      html += '<div class="section-card fade-in" style="margin-bottom:20px;">';
+      html += '<div class="section-card fade-in">';
       html += '<div class="section-card-header"><div class="section-icon">🏪</div><div><div class="section-title">Your Store Profile</div><div class="section-subtitle">Your current competitive position in this market</div></div></div>';
       html += '<div class="section-body">';
       if (store.headline) html += '<div class="summary-text" style="font-weight:500;color:var(--navy-deep);">' + store.headline + '</div>';
@@ -934,27 +954,28 @@
       html += '</div></div>';
     }
 
-    // ── Report Header ──
-    html += '<div class="report-header fade-in">';
-    html += '<div class="report-header-top">';
-    html += '<div>';
-    html += '<div class="report-eyebrow">WaveMAX Laundry · Market Growth Strategy</div>';
-    html += '<div class="report-headline">' + safe(loc.headline, 'Your Market Growth Strategy') + '</div>';
-    html += '</div>';
-    if (loc.opportunityScore) {
-      html += '<div class="opportunity-badge"><div class="score">' + loc.opportunityScore + '</div><div class="score-label">Opportunity<br>Score</div></div>';
-    }
-    html += '</div>';
-    if (loc.overview) {
-      html += '<div class="report-overview">' + safe(loc.overview);
-      if (loc.topOpportunity) {
-        html += '<div class="top-opportunity">⚡ ' + safe(loc.topOpportunity) + '</div>';
+    // ── 3. Reputation & Online Presence ──
+    if (rep.recommendations && rep.recommendations.length > 0) {
+      html += '<div class="section-card fade-in">';
+      html += '<div class="section-card-header"><div class="section-icon">⭐</div><div><div class="section-title">Reputation & Online Presence</div><div class="section-subtitle">Google Business Profile & review strategy</div></div></div>';
+      html += '<div class="section-body">';
+      if (rep.currentRating || rep.reviewCount) {
+        html += '<div style="display:flex;gap:12px;margin-bottom:14px;">';
+        if (rep.currentRating) html += '<div class="demo-stat" style="flex:1;"><div class="demo-value" style="color:var(--gold);">★ ' + rep.currentRating + '</div><div class="demo-label">Your Rating</div></div>';
+        if (rep.reviewCount) html += '<div class="demo-stat" style="flex:1;"><div class="demo-value">' + rep.reviewCount + '</div><div class="demo-label">Your Reviews</div></div>';
+        html += '</div>';
       }
-      html += '</div>';
+      if (rep.ratingVsMarket) html += '<div style="background:var(--gold-pale);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:14px;border:1px solid rgba(201,131,42,0.2);">' + rep.ratingVsMarket + '</div>';
+      if (rep.currentStrength) html += '<div class="summary-text">' + rep.currentStrength + '</div>';
+      html += '<div class="sub-label">Tactical Action Items</div>';
+      html += '<div class="rec-list">';
+      rep.recommendations.forEach(function(r, i) {
+        html += '<div class="rec-item"><div class="rec-num">' + (i + 1) + '</div><span>' + r + '</span></div>';
+      });
+      html += '</div></div></div>';
     }
-    html += '</div>';
 
-    // ── Section 0: Demographics ──
+    // ── 4. Demographics ──
     if (demo.renterPercentage || demo.totalPopulation || demo.medianIncome) {
       html += '<div class="section-card fade-in">';
       html += '<div class="section-card-header"><div class="section-icon">📍</div><div><div class="section-title">Neighborhood Demographics</div><div class="section-subtitle">Census data anchoring your market opportunity</div></div></div>';
@@ -1039,28 +1060,7 @@
     }
     html += '</div></div>';
 
-    // ── Section 3: Reputation Audit ──
-    if (rep.recommendations && rep.recommendations.length > 0) {
-      html += '<div class="section-card fade-in">';
-      html += '<div class="section-card-header"><div class="section-icon">⭐</div><div><div class="section-title">Reputation & Online Presence</div><div class="section-subtitle">Google Business Profile & review strategy</div></div></div>';
-      html += '<div class="section-body">';
-      if (rep.currentRating || rep.reviewCount) {
-        html += '<div style="display:flex;gap:12px;margin-bottom:14px;">';
-        if (rep.currentRating) html += '<div class="demo-stat" style="flex:1;"><div class="demo-value" style="color:var(--gold);">★ ' + rep.currentRating + '</div><div class="demo-label">Your Rating</div></div>';
-        if (rep.reviewCount) html += '<div class="demo-stat" style="flex:1;"><div class="demo-value">' + rep.reviewCount + '</div><div class="demo-label">Your Reviews</div></div>';
-        html += '</div>';
-      }
-      if (rep.ratingVsMarket) html += '<div style="background:var(--gold-pale);border-radius:var(--radius-sm);padding:12px 14px;font-size:13px;color:var(--text-2);line-height:1.6;margin-bottom:14px;border:1px solid rgba(201,131,42,0.2);">' + rep.ratingVsMarket + '</div>';
-      if (rep.currentStrength) html += '<div class="summary-text">' + rep.currentStrength + '</div>';
-      html += '<div class="sub-label">Tactical Action Items</div>';
-      html += '<div class="rec-list">';
-      rep.recommendations.forEach(function(r, i) {
-        html += '<div class="rec-item"><div class="rec-num">' + (i + 1) + '</div><span>' + r + '</span></div>';
-      });
-      html += '</div></div></div>';
-    }
-
-    // ── Section 4: Marketing Action Plan ──
+    // ── 8. Marketing Action Plan ──
     html += '<div class="section-card fade-in">';
     html += '<div class="section-card-header"><div class="section-icon">📋</div><div><div class="section-title">Marketing Action Plan</div><div class="section-subtitle">Prioritized tactics ranked by revenue impact</div></div></div>';
     html += '<div class="section-body">';
