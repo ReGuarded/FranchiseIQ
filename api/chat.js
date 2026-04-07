@@ -187,18 +187,6 @@ module.exports = async function handler(req, res) {
         daycares:     { results: results[8] }
       };
 
-      var results = await Promise.all([
-        Promise.all(searches.map(function(s) {
-          return searchPlaces(s.query, s.radius, s.maxN, s.presort).then(function(data) {
-            return { key: s.key, data: data };
-          });
-        })),
-        getCensus(zipCode),
-        getOwnerProfile()
-      ]);
-
-
-
       return res.status(200).json({ success: true, research: research });
     }
 
