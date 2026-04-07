@@ -89,16 +89,13 @@ module.exports = async function handler(req, res) {
         } catch(e) { return null; }
       }
 
-      // Places search
-      async function searchPlaces(query, radius, maxN, presort) {
+      // FULL search — fetches Places Details + reviews (used for competitors and apartments)
+      async function searchFull(query, radius, maxN, presort) {
         try {
           var url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + lat + ',' + lng + '&radius=' + radius + '&keyword=' + encodeURIComponent(query) + '&key=' + GOOGLE_KEY;
           var data = await (await fetch(url)).json();
           if (!data.results || data.results.length === 0) return [];
-
           var candidates = data.results;
-
-          // Pre-sort by distance for apartments using coords already in nearby response
           if (presort) {
             candidates = candidates.map(function(p) {
               var pLat = p.geometry ? p.geometry.location.lat : null;
@@ -108,12 +105,10 @@ module.exports = async function handler(req, res) {
               return (a.d !== null ? a.d : 999) - (b.d !== null ? b.d : 999);
             }).map(function(c) { return c.place; });
           }
-
           var topN = candidates.slice(0, maxN);
-
           var detailed = await Promise.all(topN.map(async function(place) {
             try {
-              var dUrl = 'https://maps.googleapis.com/maps/api/place/details/json?place_id=' + place.place_id + '&fields=name,formatted_address,formatted_phone_number,rating,user_ratings_total,opening_hours,geometry,website,reviews&key=' + GOOGLE_KEY;
+              var dUrl = 'https://maps.googleapis.com/maps/api/place/details/json?place_id=' + place.place_id + '&fields=name,formatted_address,formatted_phone_number,rating,user_ratings_total,geometry,reviews&key=' + GOOGLE_KEY;
               var det = await (await fetch(dUrl)).json();
               var d = det.result || {};
               var pLat = d.geometry ? d.geometry.location.lat : (place.geometry ? place.geometry.location.lat : null);
@@ -127,24 +122,70 @@ module.exports = async function handler(req, res) {
               return { name: place.name, address: place.vicinity, rating: place.rating || null, reviewCount: place.user_ratings_total || 0, placeId: place.place_id, reviews: [] };
             }
           }));
-
           return detailed.sort(function(a, b) { return (a.distanceMiles !== null ? a.distanceMiles : 999) - (b.distanceMiles !== null ? b.distanceMiles : 999); });
         } catch(e) { return []; }
       }
 
-      // All searches + census + owner profile in parallel
-      // Apartments use TWO radius passes: tight (1500m) to catch adjacent complexes + wider (3200m) for context
-      var searches = [
-        { key: 'competitors', query: 'laundromat coin laundry wash fold',     radius: 5000, maxN: 8, presort: false },
-        { key: 'apartments',  query: 'apartment complex',                      radius: 1500, maxN: 8, presort: true  },
-        { key: 'hotels',      query: 'hotel motel inn suites',                 radius: 3200, maxN: 5, presort: false },
-        { key: 'gyms',        query: 'gym fitness center boxing martial arts', radius: 3200, maxN: 5, presort: false },
-        { key: 'medical',     query: 'medical clinic dental urgent care',      radius: 3200, maxN: 5, presort: false },
-        { key: 'restaurants', query: 'restaurant food service',                radius: 3200, maxN: 5, presort: false },
-        { key: 'salons',      query: 'hair salon nail spa beauty',             radius: 3200, maxN: 5, presort: false },
-        { key: 'automotive',  query: 'auto repair mechanic shop',              radius: 3200, maxN: 5, presort: false },
-        { key: 'daycares',    query: 'daycare childcare preschool',            radius: 3200, maxN: 5, presort: false }
-      ];
+      // LIGHT search — uses Nearby Search data only, NO Details API call (used for commercial categories)
+      // Nearby Search already returns name, vicinity, rating, review count, and geometry — enough for commercial targets
+      async function searchLight(query, radius, maxN) {
+        try {
+          var url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + lat + ',' + lng + '&radius=' + radius + '&keyword=' + encodeURIComponent(query) + '&key=' + GOOGLE_KEY;
+          var data = await (await fetch(url)).json();
+          if (!data.results || data.results.length === 0) return [];
+          return data.results.slice(0, maxN).map(function(place) {
+            var pLat = place.geometry ? place.geometry.location.lat : null;
+            var pLng = place.geometry ? place.geometry.location.lng : null;
+            var dm = distMiles(lat, lng, pLat, pLng);
+            return {
+              name: place.name,
+              address: place.vicinity,
+              rating: place.rating || null,
+              reviewCount: place.user_ratings_total || 0,
+              placeId: place.place_id,
+              lat: pLat,
+              lng: pLng,
+              distanceMiles: dm,
+              distanceLabel: fmtDist(dm),
+              reviews: []
+            };
+          }).sort(function(a, b) {
+            return (a.distanceMiles !== null ? a.distanceMiles : 999) - (b.distanceMiles !== null ? b.distanceMiles : 999);
+          });
+        } catch(e) { return []; }
+      }
+
+      // Run all searches in parallel
+      // Competitors + Apartments: full Details + reviews
+      // Commercial categories: lightweight Nearby only — eliminates ~35 API calls
+      var results = await Promise.all([
+        searchFull('laundromat coin laundry wash fold', 5000, 8, false),
+        searchFull('apartment complex', 1500, 8, true),
+        searchLight('hotel motel inn suites', 3200, 4),
+        searchLight('gym fitness center boxing martial arts', 3200, 4),
+        searchLight('medical clinic dental urgent care', 3200, 4),
+        searchLight('restaurant food service', 3200, 4),
+        searchLight('hair salon nail spa beauty', 3200, 4),
+        searchLight('auto repair mechanic shop', 3200, 4),
+        searchLight('daycare childcare preschool', 3200, 4),
+        getCensus(zipCode),
+        getOwnerProfile()
+      ]);
+
+      var research = {
+        address: formattedAddress, lat: lat, lng: lng, zipCode: zipCode,
+        demographics: results[9],
+        ownerProfile: results[10],
+        competitors:  { results: results[0] },
+        apartments:   { results: results[1] },
+        hotels:       { results: results[2] },
+        gyms:         { results: results[3] },
+        medical:      { results: results[4] },
+        restaurants:  { results: results[5] },
+        salons:       { results: results[6] },
+        automotive:   { results: results[7] },
+        daycares:     { results: results[8] }
+      };
 
       var results = await Promise.all([
         Promise.all(searches.map(function(s) {
@@ -156,12 +197,7 @@ module.exports = async function handler(req, res) {
         getOwnerProfile()
       ]);
 
-      var placesResults = results[0];
-      var censusData = results[1];
-      var ownerProfile = results[2];
 
-      var research = { address: formattedAddress, lat: lat, lng: lng, zipCode: zipCode, demographics: censusData, ownerProfile: ownerProfile };
-      placesResults.forEach(function(r) { research[r.key] = { results: r.data }; });
 
       return res.status(200).json({ success: true, research: research });
     }
