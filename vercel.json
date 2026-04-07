@@ -1,5 +1,10 @@
 {
   "version": 2,
+  "functions": {
+    "api/chat.js": {
+      "maxDuration": 60
+    }
+  },
   "builds": [
     {
       "src": "api/chat.js",
