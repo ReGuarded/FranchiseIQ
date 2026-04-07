@@ -159,8 +159,8 @@ module.exports = async function handler(req, res) {
       // Competitors + Apartments: full Details + reviews
       // Commercial categories: lightweight Nearby only — eliminates ~35 API calls
       var results = await Promise.all([
-        searchFull('laundromat coin laundry wash fold', 5000, 8, false),
-        searchFull('apartment complex', 1500, 8, true),
+        searchFull('laundromat coin laundry wash fold', 5000, 4, false),
+        searchFull('apartment complex', 1500, 6, true),
         searchLight('hotel motel inn suites', 3200, 4),
         searchLight('gym fitness center boxing martial arts', 3200, 4),
         searchLight('medical clinic dental urgent care', 3200, 4),
