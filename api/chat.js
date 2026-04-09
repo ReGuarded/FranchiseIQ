@@ -1,9 +1,8 @@
-// FranchiseIQ v1.2 — API handler
+// FranchiseIQ v1.3
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
@@ -17,7 +16,6 @@ module.exports = async function handler(req, res) {
       const GOOGLE_KEY = process.env.GOOGLE_MAPS_API_KEY;
       if (!GOOGLE_KEY) return res.status(200).json({ error: 'Google Maps API key not configured' });
 
-      // Geocode address
       const geoRes = await fetch('https://maps.googleapis.com/maps/api/geocode/json?address=' + encodeURIComponent(address) + '&key=' + GOOGLE_KEY);
       const geoData = await geoRes.json();
       if (!geoData.results || geoData.results.length === 0) return res.status(200).json({ error: 'Address not found' });
@@ -26,17 +24,14 @@ module.exports = async function handler(req, res) {
       const lng = geoData.results[0].geometry.location.lng;
       const formattedAddress = geoData.results[0].formatted_address;
 
-      // Extract zip code
       var zipCode = null;
       var comps = geoData.results[0].address_components || [];
       for (var i = 0; i < comps.length; i++) {
         if (comps[i].types.indexOf('postal_code') !== -1) { zipCode = comps[i].long_name; break; }
       }
 
-      // Distance helper
       function distMiles(lat1, lng1, lat2, lng2) {
         if (!lat1 || !lng1 || !lat2 || !lng2) return null;
-        var R = 3958.8;
         var dLat = (lat2 - lat1) * Math.PI / 180;
         var dLng = (lng2 - lng1) * Math.PI / 180;
         var a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLng/2) * Math.sin(dLng/2);
@@ -50,7 +45,6 @@ module.exports = async function handler(req, res) {
         return m + ' miles away';
       }
 
-      // Census lookup
       async function getCensus(zip) {
         if (!zip) return null;
         try {
@@ -72,7 +66,6 @@ module.exports = async function handler(req, res) {
         } catch(e) { return null; }
       }
 
-      // Owner profile lookup
       async function getOwnerProfile() {
         try {
           var url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + lat + ',' + lng + '&radius=100&keyword=laundromat+laundry&key=' + GOOGLE_KEY;
@@ -89,7 +82,6 @@ module.exports = async function handler(req, res) {
         } catch(e) { return null; }
       }
 
-      // FULL search — fetches Places Details + reviews (used for competitors and apartments)
       async function searchFull(query, radius, maxN, presort) {
         try {
           var url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + lat + ',' + lng + '&radius=' + radius + '&keyword=' + encodeURIComponent(query) + '&key=' + GOOGLE_KEY;
@@ -101,9 +93,7 @@ module.exports = async function handler(req, res) {
               var pLat = p.geometry ? p.geometry.location.lat : null;
               var pLng = p.geometry ? p.geometry.location.lng : null;
               return { place: p, d: distMiles(lat, lng, pLat, pLng) };
-            }).sort(function(a, b) {
-              return (a.d !== null ? a.d : 999) - (b.d !== null ? b.d : 999);
-            }).map(function(c) { return c.place; });
+            }).sort(function(a, b) { return (a.d !== null ? a.d : 999) - (b.d !== null ? b.d : 999); }).map(function(c) { return c.place; });
           }
           var topN = candidates.slice(0, maxN);
           var detailed = await Promise.all(topN.map(async function(place) {
@@ -114,20 +104,14 @@ module.exports = async function handler(req, res) {
               var pLat = d.geometry ? d.geometry.location.lat : (place.geometry ? place.geometry.location.lat : null);
               var pLng = d.geometry ? d.geometry.location.lng : (place.geometry ? place.geometry.location.lng : null);
               var dm = distMiles(lat, lng, pLat, pLng);
-              var reviews = (d.reviews || []).slice(0, 3).map(function(r) {
-                return { rating: r.rating, text: (r.text || '').substring(0, 300) };
-              }).filter(function(r) { return r.text.length > 20; });
+              var reviews = (d.reviews || []).slice(0, 3).map(function(r) { return { rating: r.rating, text: (r.text || '').substring(0, 300) }; }).filter(function(r) { return r.text.length > 20; });
               return { name: d.name || place.name, address: d.formatted_address || place.vicinity, phone: d.formatted_phone_number || null, rating: d.rating || place.rating || null, reviewCount: d.user_ratings_total || place.user_ratings_total || 0, placeId: place.place_id, lat: pLat, lng: pLng, distanceMiles: dm, distanceLabel: fmtDist(dm), reviews: reviews };
-            } catch(e) {
-              return { name: place.name, address: place.vicinity, rating: place.rating || null, reviewCount: place.user_ratings_total || 0, placeId: place.place_id, reviews: [] };
-            }
+            } catch(e) { return { name: place.name, address: place.vicinity, rating: place.rating || null, reviewCount: place.user_ratings_total || 0, placeId: place.place_id, reviews: [] }; }
           }));
           return detailed.sort(function(a, b) { return (a.distanceMiles !== null ? a.distanceMiles : 999) - (b.distanceMiles !== null ? b.distanceMiles : 999); });
         } catch(e) { return []; }
       }
 
-      // LIGHT search — uses Nearby Search data only, NO Details API call (used for commercial categories)
-      // Nearby Search already returns name, vicinity, rating, review count, and geometry — enough for commercial targets
       async function searchLight(query, radius, maxN) {
         try {
           var url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=' + lat + ',' + lng + '&radius=' + radius + '&keyword=' + encodeURIComponent(query) + '&key=' + GOOGLE_KEY;
@@ -137,27 +121,11 @@ module.exports = async function handler(req, res) {
             var pLat = place.geometry ? place.geometry.location.lat : null;
             var pLng = place.geometry ? place.geometry.location.lng : null;
             var dm = distMiles(lat, lng, pLat, pLng);
-            return {
-              name: place.name,
-              address: place.vicinity,
-              rating: place.rating || null,
-              reviewCount: place.user_ratings_total || 0,
-              placeId: place.place_id,
-              lat: pLat,
-              lng: pLng,
-              distanceMiles: dm,
-              distanceLabel: fmtDist(dm),
-              reviews: []
-            };
-          }).sort(function(a, b) {
-            return (a.distanceMiles !== null ? a.distanceMiles : 999) - (b.distanceMiles !== null ? b.distanceMiles : 999);
-          });
+            return { name: place.name, address: place.vicinity, rating: place.rating || null, reviewCount: place.user_ratings_total || 0, placeId: place.place_id, lat: pLat, lng: pLng, distanceMiles: dm, distanceLabel: fmtDist(dm), reviews: [] };
+          }).sort(function(a, b) { return (a.distanceMiles !== null ? a.distanceMiles : 999) - (b.distanceMiles !== null ? b.distanceMiles : 999); });
         } catch(e) { return []; }
       }
 
-      // Run all searches in parallel
-      // Competitors + Apartments: full Details + reviews
-      // Commercial categories: lightweight Nearby only — eliminates ~35 API calls
       var results = await Promise.all([
         searchFull('laundromat coin laundry wash fold', 5000, 4, false),
         searchFull('apartment complex', 1500, 6, true),
@@ -194,7 +162,28 @@ module.exports = async function handler(req, res) {
     if (type === 'synthesize') {
       const { research, formData } = body;
 
-      var systemPrompt = 'You are FranchiseIQ, an expert franchise market analyst. You produce market intelligence reports that read like a senior business consultant spent days researching this location.\n\nYour analysis must be:\n- SPECIFIC: Reference actual business names, real distances, actual review counts, and real demographic numbers\n- NARRATIVE: Write with conviction. Use phrases like "The data reveals..." or "What makes this location unusual is..."\n- PRIORITIZED: Rank everything by revenue impact and ease of execution\n- ACTIONABLE: Tell the owner exactly what to do, when, and why\n- HONEST: Name real competitive threats. Do not sugarcoat.\n\nBUSINESS PROFILE & REPUTATION: Combine the store profile and reputation into one powerful section. Lead with stats (rating, reviews, washers/dryers). Compare rating directly to named competitors. Mine the owner\'s own Google reviews for specific themes — cleanliness, staff names, machine quality. If staff are mentioned by name (e.g. Nora, Jessica), call them out — this is a marketing asset worth highlighting. Identify one honest gap. Give 4 specific tactical actions.\n\nAPARTMENT TARGETING: Prioritize complexes that are CLOSEST first. Low-rated complexes (under 3.5 stars) with laundry complaints are HIGHEST priority. Mine review text for "broken machines", "laundry", "maintenance" — these signal warm leads. List minimum 5 complexes.\n\nCOMPETITOR ANALYSIS: Include minimum 5 competitors. Reference specific weaknesses from review text. Coin-only payment, dirty facilities, theft complaints are exploitable weaknesses.\n\nREPUTATION: Reference the owner\'s actual retrieved rating. Compare directly to every named competitor. Give specific tactical advice on review responses, new review generation, Google Business Profile posts.\n\nBUDGET: Calibrate all recommendations to the stated budget. Never exceed it. Budget breakdown must sum to stated range.\n\nCOMMERCIAL OUTREACH: Use distance to sequence — same block = Week 1, under 1 mile = Month 1, 1-2 miles = Month 2.\n\nOutput structured JSON only. Every field must be specific and data-grounded — no placeholder language.';
+      var systemPrompt = [
+        'You are FranchiseIQ, an expert franchise market analyst. You produce market intelligence reports that read like a senior business consultant spent days researching this location.',
+        '',
+        'Your analysis must be:',
+        '- SPECIFIC: Reference actual business names, real distances, actual review counts, and real demographic numbers',
+        '- NARRATIVE: Write with conviction. Use phrases like "The data reveals..." or "What makes this location unusual is..."',
+        '- PRIORITIZED: Rank everything by revenue impact and ease of execution',
+        '- ACTIONABLE: Tell the owner exactly what to do, when, and why',
+        '- HONEST: Name real competitive threats. Do not sugarcoat.',
+        '',
+        'BUSINESS PROFILE & REPUTATION: Combine store stats and reputation into one rich section. Lead with rating and review count. Compare rating directly to named competitors. Mine the owner\'s own Google reviews for specific themes — cleanliness, staff names, machine quality. If staff are mentioned by name (e.g. Nora, Jessica), call them out specifically — named staff are a marketing moat. Identify one honest gap. Give 4 specific tactical actions.',
+        '',
+        'APARTMENT TARGETING: Prioritize complexes that are CLOSEST first. Low-rated complexes (under 3.5 stars) with laundry complaints are HIGHEST priority. Mine review text for broken machines, laundry, maintenance. List minimum 5 complexes.',
+        '',
+        'COMPETITOR ANALYSIS: Include minimum 5 competitors. Reference specific weaknesses from review text. Coin-only payment, dirty facilities, theft complaints are exploitable weaknesses.',
+        '',
+        'BUDGET: Calibrate all recommendations to the stated budget. Never exceed it.',
+        '',
+        'COMMERCIAL OUTREACH: Use distance to sequence — same block = Week 1, under 1 mile = Month 1, 1-2 miles = Month 2. Six categories: Hotels (linens/uniforms), Restaurants (daily kitchen laundry), Salons & Gyms (towels/gear), Medical & Dental (scrubs), Daycares (bibs/nap mats), Auto Shops (shop rags).',
+        '',
+        'Output structured JSON only. Every field must be specific and data-grounded.'
+      ].join('\n');
 
       var challengesText = (formData.challenges && formData.challenges.length > 0) ? formData.challenges.join(', ') : 'Not specified';
       var marketingText = (formData.marketing && formData.marketing.length > 0) ? formData.marketing.join(', ') : 'Not specified';
@@ -215,7 +204,7 @@ module.exports = async function handler(req, res) {
       var demoText = 'Census data unavailable';
       if (research.demographics) {
         var d = research.demographics;
-        demoText = 'ZIP: ' + (d.zip || 'N/A') + '\nPopulation: ' + (d.totalPopulation ? d.totalPopulation.toLocaleString() : 'N/A') + '\nRenter-Occupied: ' + (d.renterPercentage !== null ? d.renterPercentage + '%' : 'N/A') + (d.renterPercentage > 45 ? ' (ABOVE AVERAGE — strong demand signal)' : '') + '\nMedian Income: ' + (d.medianHouseholdIncome || 'N/A') + '\nMedian Rent: ' + (d.medianGrossRent || 'N/A') + '\nMedian Age: ' + (d.medianAge || 'N/A') + '\nHousing Era: ' + (d.housingEra || 'N/A');
+        demoText = 'ZIP: ' + (d.zip || 'N/A') + '\nPopulation: ' + (d.totalPopulation ? d.totalPopulation.toLocaleString() : 'N/A') + '\nRenter-Occupied: ' + (d.renterPercentage !== null ? d.renterPercentage + '%' : 'N/A') + (d.renterPercentage > 45 ? ' (ABOVE AVERAGE)' : '') + '\nMedian Income: ' + (d.medianHouseholdIncome || 'N/A') + '\nMedian Rent: ' + (d.medianGrossRent || 'N/A') + '\nMedian Age: ' + (d.medianAge || 'N/A') + '\nHousing Era: ' + (d.housingEra || 'N/A');
       }
 
       var ownerText = 'Could not retrieve — use competitor data for context';
@@ -225,7 +214,155 @@ module.exports = async function handler(req, res) {
         ownerText = 'Name: ' + (op.name || 'N/A') + '\nRating: ' + (op.rating ? op.rating + ' stars' : 'N/A') + '\nReviews: ' + (op.reviewCount || 'N/A') + '\nPhone: ' + (op.phone || 'N/A') + (revLines ? '\nSample reviews:\n' + revLines : '');
       }
 
-      var prompt = 'Analyze this WaveMAX Laundry franchise. Use review text for intelligence. Use Census data for demographics. Use distances to sequence outreach.\n\nFRANCHISE: ' + research.address + '\n\nOWNER GOOGLE PROFILE (auto-retrieved):\n' + ownerText + '\n\nOWNER CONTEXT:\n- Brand: ' + (formData.brand === 'wavemax' ? 'WaveMAX Laundry' : formData.brand) + '\n- Washers: ' + (formData.washers || 'N/A') + '\n- Dryers: ' + (formData.dryers || 'N/A') + '\n- Revenue: ' + revenueText + '\n- Budget: ' + budgetText + '\n- Challenges: ' + challengesText + '\n- Marketing: ' + marketingText + '\n\nDEMOGRAPHICS:\n' + demoText + '\n\nCOMPETITORS (sorted by distance — list minimum 5):\n' + summarize('competitors') + '\n\nAPARTMENTS (sorted closest first — list minimum 5, prioritize low-rated complexes with laundry complaints):\n' + summarize('apartments') + '\n\nHOTELS:\n' + summarize('hotels') + '\n\nGYMS:\n' + summarize('gyms') + '\n\nMEDICAL & DENTAL:\n' + summarize('medical') + '\n\nRESTAURANTS:\n' + summarize('restaurants') + '\n\nSALONS & SPAS:\n' + summarize('salons') + '\n\nAUTO REPAIR SHOPS:\n' + summarize('automotive') + '\n\nDAYCARES & CHILDCARE:\n' + summarize('daycares') + '\n\nReturn ONLY valid JSON with this structure:\n\n{\n  "businessProfile": {\\n    \"headline\": \"One sharp sentence on market position — reference actual rating vs named competitors\",\\n    \"rating\": \"X.X\",\\n    \"reviewCount\": \"XXX\",\\n    \"washers\": \"XX\",\\n    \"dryers\": \"XX\",\\n    \"ratingVsMarket\": \"2-3 sentences comparing rating directly to every named competitor — be specific\",\\n    \"reviewThemes\": [\\n      {\"theme\": \"Cleanliness\", \"sampleQuote\": \"actual quote from their own Google reviews\", \"marketingImplication\": \"what to do with this insight\"},\\n      {\"theme\": \"Staff warmth\", \"sampleQuote\": \"quote mentioning staff by name if available\", \"marketingImplication\": \"implication\"},\\n      {\"theme\": \"Machine quality or other theme\", \"sampleQuote\": \"quote\", \"marketingImplication\": \"implication\"}\\n    ],\\n    \"staffAdvantage\": \"If any staff mentioned by name in reviews (e.g. Nora, Jessica) call them out specifically — named staff are a marketing moat\",\\n    \"oneGap\": \"The single honest weakness to address — e.g. payment friction, limited hours, low social media presence\",\\n    \"immediateOpportunity\": \"The single most important action in the next 7 days\",\\n    \"tacticalActions\": [\"Specific tactical action 1\", \"Specific action 2\", \"Specific action 3\", \"Specific action 4\"]\\n  },\\n  "locationSummary": {\n    "headline": "Sharp specific sentence on biggest market opportunity",\n    "overview": "3-4 sentence narrative grounded in actual data",\n    "opportunityScore": 85,\n    "topOpportunity": "Single highest-revenue opportunity"\n  },\n  "marketResearch": {\n    "demographics": {\n      "headline": "What the demographic profile means for this business",\n      "renterPercentage": "XX%",\n      "totalPopulation": "XX,XXX",\n      "medianIncome": "$XX,XXX",\n      "housingEra": "description",\n      "keyInsight": "2-3 sentences on what these numbers mean for laundromat demand here"\n    },\n    "competitorAnalysis": {\n      "summary": "3-4 sentences on competitive landscape referencing specific names and review weaknesses",\n      "competitors": [\n        {"name": "exact name", "address": "address", "distanceLabel": "X.X miles away", "rating": 4.2, "reviewCount": 180, "threat": "High/Medium/Low", "weakness": "Specific weakness from review text", "opportunityAngle": "How this creates an opening"}\n      ],\n      "competitiveAdvantage": "2-3 sentences on this owner\'s specific advantages"\n    },\n    "apartmentOpportunity": {\n      "summary": "3-4 sentences referencing specific complex names, distances, and laundry frustration signals",\n      "totalComplexes": 5,\n      "estimatedHouseholds": 1000,\n      "monthlyLaundrySpend": "$20,000",\n      "topTargets": [\n        {"name": "exact name", "address": "address", "distanceLabel": "X.X miles away", "priority": "High/Medium/Low", "rating": 3.0, "reviewCount": 197, "laundryFrustration": "Specific complaint from reviews or proximity rationale", "reason": "Why this complex is a priority"}\n      ]\n    },\n    "reputationAudit": null\n  },\n  "marketingActionPlan": {\n    "summary": "2-3 sentences referencing specific market conditions and stated budget",\n    "tactics": [\n      {"rank": 1, "title": "Tactic name", "category": "Apartment Outreach / Commercial / Digital / In-Store", "description": "3-4 sentences with specific names and actionable steps", "effort": "Low/Medium/High", "impact": "Low/Medium/High", "timeframe": "Week 1-2 / Month 1 / Ongoing", "estimatedMonthlyRevenue": "$X,XXX-X,XXX"}\n    ],\n    "budgetAllocation": {\n      "total": "Must match stated budget",\n      "breakdown": [{"category": "name", "amount": "$XX", "rationale": "specific rationale"}]\n    },\n    "checklist90Day": {\n      "week1_2": ["action naming real businesses", "action 2", "action 3"],\n      "month1": ["action 1", "action 2", "action 3"],\n      "month2": ["action 1", "action 2"],\n      "month3": ["action 1", "action 2"]\n    }\n  },\n  "commercialTargets": {\n    "summary": "3-4 sentences on commercial opportunity referencing specific categories and distance clusters",\n    "totalEstimatedMonthlyRevenue": "$X,XXX-X,XXX",\n    "outreachPhases": {\n      "phase1": "Week 1 — name specific same-block or walking-distance targets",\n      "phase2": "Month 1 — name under-1-mile targets by name and category",\n      "phase3": "Month 2 — describe 1-2 mile targets"\n    },\n    "targets": [\n      {"businessName": "exact name", "category": "Hotel/Gym/Medical/Restaurant/Salon/Auto/Other", "address": "address", "distanceLabel": "X.X miles away", "priority": "High/Medium/Low", "estimatedMonthlyRevenue": "$XXX-XXX", "pitchAngle": "Specific pitch for this business", "bestApproachTime": "When and how to approach"}\n    ]\n  },\n  "collateral": {\n    "onePager": {\n      "headline": "Compelling commercial headline",\n      "subheadline": "Supporting line",\n      "bulletPoints": ["benefit 1", "benefit 2", "benefit 3", "benefit 4"],\n      "callToAction": "Specific CTA",\n      "contactPrompt": "How to reach out"\n    },\n    "doorHanger": {\n      "headline": "Headline referencing proximity to closest apartments",\n      "offerLine": "Compelling offer for residents",\n      "bulletPoints": ["benefit 1", "benefit 2", "benefit 3"],\n      "callToAction": "CTA with address"\n    }\n  }\n}';
+      // Build the JSON template as a proper JS object then stringify — no escaping issues
+      var jsonTemplate = {
+        businessProfile: {
+          headline: "One sharp sentence on market position — reference actual rating vs named competitors",
+          rating: "X.X",
+          reviewCount: "XXX",
+          washers: "XX",
+          dryers: "XX",
+          ratingVsMarket: "2-3 sentences comparing rating directly to every named competitor — be specific about the gap",
+          reviewThemes: [
+            { theme: "Cleanliness", sampleQuote: "actual quote from their own Google reviews", marketingImplication: "what to do with this insight" },
+            { theme: "Staff warmth", sampleQuote: "quote mentioning staff by name if available", marketingImplication: "implication" },
+            { theme: "Machine quality or other prominent theme", sampleQuote: "quote", marketingImplication: "implication" }
+          ],
+          staffAdvantage: "If any staff mentioned by name in reviews (e.g. Nora, Jessica) call them out specifically — named staff are a marketing moat. If no names found, describe the personal service advantage.",
+          oneGap: "The single honest weakness to address — e.g. payment friction, limited hours, low social media presence",
+          immediateOpportunity: "The single most important action in the next 7 days",
+          tacticalActions: ["Specific tactical action 1", "Specific action 2", "Specific action 3", "Specific action 4"]
+        },
+        locationSummary: {
+          headline: "Sharp specific sentence on biggest market opportunity",
+          overview: "3-4 sentence narrative grounded in actual data",
+          opportunityScore: 85,
+          topOpportunity: "Single highest-revenue opportunity"
+        },
+        marketResearch: {
+          demographics: {
+            headline: "What the demographic profile means for this business",
+            renterPercentage: "XX%",
+            totalPopulation: "XX,XXX",
+            medianIncome: "$XX,XXX",
+            housingEra: "description",
+            keyInsight: "2-3 sentences on what these numbers mean for laundromat demand here"
+          },
+          competitorAnalysis: {
+            summary: "3-4 sentences on competitive landscape referencing specific names and review weaknesses",
+            competitors: [
+              { name: "exact name", address: "address", distanceLabel: "X.X miles away", rating: 4.2, reviewCount: 180, threat: "High/Medium/Low", weakness: "Specific weakness from review text", opportunityAngle: "How this creates an opening" }
+            ],
+            competitiveAdvantage: "2-3 sentences on this owner's specific advantages"
+          },
+          apartmentOpportunity: {
+            summary: "3-4 sentences referencing specific complex names, distances, and laundry frustration signals",
+            totalComplexes: 5,
+            estimatedHouseholds: 1000,
+            monthlyLaundrySpend: "$20,000",
+            topTargets: [
+              { name: "exact name", address: "address", distanceLabel: "X.X miles away", priority: "High/Medium/Low", rating: 3.0, reviewCount: 197, laundryFrustration: "Specific complaint from reviews or proximity rationale", reason: "Why this complex is a priority" }
+            ]
+          }
+        },
+        marketingActionPlan: {
+          summary: "2-3 sentences referencing specific market conditions and stated budget",
+          tactics: [
+            { rank: 1, title: "Tactic name", category: "Apartment Outreach / Commercial / Digital / In-Store", description: "3-4 sentences with specific names and actionable steps", effort: "Low/Medium/High", impact: "Low/Medium/High", timeframe: "Week 1-2 / Month 1 / Ongoing", estimatedMonthlyRevenue: "$X,XXX-X,XXX" }
+          ],
+          budgetAllocation: {
+            total: "Must match stated budget",
+            breakdown: [{ category: "name", amount: "$XX", rationale: "specific rationale" }]
+          },
+          checklist90Day: {
+            week1_2: ["action naming real businesses", "action 2", "action 3"],
+            month1: ["action 1", "action 2", "action 3"],
+            month2: ["action 1", "action 2"],
+            month3: ["action 1", "action 2"]
+          }
+        },
+        commercialTargets: {
+          summary: "3-4 sentences on commercial opportunity referencing specific categories and distance clusters",
+          totalEstimatedMonthlyRevenue: "$X,XXX-X,XXX",
+          outreachPhases: {
+            phase1: "Week 1 — name specific same-block or walking-distance targets",
+            phase2: "Month 1 — name under-1-mile targets by name and category",
+            phase3: "Month 2 — describe 1-2 mile targets"
+          },
+          targets: [
+            { businessName: "exact name", category: "Hotel/Gym/Medical/Restaurant/Salon/Auto/Daycare", address: "address", distanceLabel: "X.X miles away", priority: "High/Medium/Low", estimatedMonthlyRevenue: "$XXX-XXX", pitchAngle: "Specific pitch for this business", bestApproachTime: "When and how to approach" }
+          ]
+        },
+        collateral: {
+          onePager: {
+            headline: "Compelling commercial headline",
+            subheadline: "Supporting line",
+            bulletPoints: ["benefit 1", "benefit 2", "benefit 3", "benefit 4"],
+            callToAction: "Specific CTA",
+            contactPrompt: "How to reach out"
+          },
+          doorHanger: {
+            headline: "Headline referencing proximity to closest apartments",
+            offerLine: "Compelling offer for residents",
+            bulletPoints: ["benefit 1", "benefit 2", "benefit 3"],
+            callToAction: "CTA with address"
+          }
+        }
+      };
+
+      var promptParts = [
+        'Analyze this WaveMAX Laundry franchise. Use review text for intelligence. Use Census data for demographics. Use distances to sequence outreach.',
+        '',
+        'FRANCHISE: ' + research.address,
+        '',
+        'OWNER GOOGLE PROFILE (auto-retrieved):',
+        ownerText,
+        '',
+        'OWNER CONTEXT:',
+        '- Brand: ' + (formData.brand === 'wavemax' ? 'WaveMAX Laundry' : formData.brand),
+        '- Washers: ' + (formData.washers || 'N/A'),
+        '- Dryers: ' + (formData.dryers || 'N/A'),
+        '- Revenue: ' + revenueText,
+        '- Budget: ' + budgetText,
+        '- Challenges: ' + challengesText,
+        '- Marketing: ' + marketingText,
+        '',
+        'DEMOGRAPHICS:',
+        demoText,
+        '',
+        'COMPETITORS (sorted by distance — list minimum 5):',
+        summarize('competitors'),
+        '',
+        'APARTMENTS (sorted closest first — list minimum 5, prioritize low-rated with laundry complaints):',
+        summarize('apartments'),
+        '',
+        'HOTELS:',
+        summarize('hotels'),
+        '',
+        'GYMS:',
+        summarize('gyms'),
+        '',
+        'MEDICAL & DENTAL:',
+        summarize('medical'),
+        '',
+        'RESTAURANTS:',
+        summarize('restaurants'),
+        '',
+        'SALONS & SPAS:',
+        summarize('salons'),
+        '',
+        'AUTO REPAIR SHOPS:',
+        summarize('automotive'),
+        '',
+        'DAYCARES & CHILDCARE:',
+        summarize('daycares'),
+        '',
+        'Return ONLY valid JSON matching this exact structure (replace all placeholder values with real data):',
+        '',
+        JSON.stringify(jsonTemplate, null, 2)
+      ];
+
+      var prompt = promptParts.join('\n');
 
       var aiRes = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -253,5 +390,4 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: { message: err.message } });
   }
 };
-
 
