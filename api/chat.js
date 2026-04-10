@@ -1,4 +1,4 @@
-// FranchiseIQ v1.3
+// FranchiseIQ v1.4
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -390,3 +390,4 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: { message: err.message } });
   }
 };
+
