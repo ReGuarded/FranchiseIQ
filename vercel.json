@@ -5,20 +5,6 @@
       "maxDuration": 60
     }
   },
-  "builds": [
-    {
-      "src": "api/chat.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "public/index.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "public/report.html",
-      "use": "@vercel/static"
-    }
-  ],
   "routes": [
     {
       "src": "/api/chat",
@@ -34,4 +20,3 @@
     }
   ]
 }
-
