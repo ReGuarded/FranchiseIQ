@@ -1,22 +1,8 @@
 {
-  "version": 2,
-  "functions": {
-    "api/chat.js": {
-      "maxDuration": 60
-    }
-  },
-  "routes": [
-    {
-      "src": "/api/chat",
-      "dest": "/api/chat.js"
-    },
-    {
-      "src": "/report",
-      "dest": "/public/report.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/public/index.html"
-    }
+  "rewrites": [
+    { "source": "/collateral-commercial", "destination": "/collateral-commercial.html" },
+    { "source": "/collateral-flyer", "destination": "/collateral-flyer.html" },
+    { "source": "/report", "destination": "/report.html" },
+    { "source": "/", "destination": "/index.html" }
   ]
 }

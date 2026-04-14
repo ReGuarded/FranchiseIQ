@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- FranchiseIQ v1.1 — Report Page -->
+<!-- FranchiseIQ v1.2 — Report Page -->
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -314,7 +314,6 @@
 
   .section-body { padding: 24px 28px; }
 
-  /* Summary text */
   .summary-text {
     font-size: 14px;
     font-weight: 300;
@@ -323,7 +322,6 @@
     margin-bottom: 20px;
   }
 
-  /* Subsection label */
   .sub-label {
     font-family: 'DM Mono', monospace;
     font-size: 10px;
@@ -363,22 +361,11 @@
     flex-shrink: 0;
   }
 
-  .comp-name {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-1);
-    margin-bottom: 2px;
-  }
-
+  .comp-name { font-size: 14px; font-weight: 500; color: var(--text-1); margin-bottom: 2px; }
   .comp-address { font-size: 12px; color: var(--text-3); margin-bottom: 6px; }
-
   .comp-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
-  .comp-rating {
-    font-size: 12px;
-    color: var(--gold);
-    font-family: 'DM Mono', monospace;
-  }
+  .comp-rating { font-size: 12px; color: var(--gold); font-family: 'DM Mono', monospace; }
 
   .threat-badge {
     font-size: 11px;
@@ -392,12 +379,7 @@
   .threat-medium { background: var(--gold-pale); color: var(--gold); }
   .threat-low { background: var(--success-pale); color: var(--success); }
 
-  .comp-weakness {
-    font-size: 12px;
-    color: var(--text-2);
-    margin-top: 5px;
-    font-style: italic;
-  }
+  .comp-weakness { font-size: 12px; color: var(--text-2); margin-top: 5px; font-style: italic; }
 
   /* Apartment targets */
   .apt-stats {
@@ -503,9 +485,7 @@
   }
 
   .tactic-body { padding: 14px 16px; }
-
   .tactic-desc { font-size: 13px; font-weight: 300; color: var(--text-2); line-height: 1.65; margin-bottom: 10px; }
-
   .tactic-meta { display: flex; gap: 10px; flex-wrap: wrap; }
 
   .meta-pill {
@@ -518,13 +498,7 @@
   }
 
   /* Budget */
-  .budget-total {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.3rem;
-    color: var(--navy-deep);
-    margin-bottom: 14px;
-  }
-
+  .budget-total { font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: var(--navy-deep); margin-bottom: 14px; }
   .budget-list { display: flex; flex-direction: column; gap: 8px; }
 
   .budget-item {
@@ -540,14 +514,7 @@
 
   .budget-category { font-size: 13px; font-weight: 500; color: var(--text-1); }
   .budget-rationale { font-size: 12px; color: var(--text-3); margin-top: 2px; }
-  .budget-amount {
-    font-family: 'DM Mono', monospace;
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--navy);
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
+  .budget-amount { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; color: var(--navy); white-space: nowrap; flex-shrink: 0; }
 
   /* 90-day checklist */
   .checklist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
@@ -600,18 +567,8 @@
     margin-bottom: 16px;
   }
 
-  .commercial-revenue {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.5rem;
-    color: var(--gold);
-  }
-
-  .commercial-revenue-label {
-    font-size: 12px;
-    color: var(--text-2);
-    font-weight: 300;
-  }
-
+  .commercial-revenue { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--gold); }
+  .commercial-revenue-label { font-size: 12px; color: var(--text-2); font-weight: 300; }
   .commercial-list { display: flex; flex-direction: column; gap: 10px; }
 
   .commercial-card {
@@ -630,14 +587,7 @@
   }
 
   .commercial-name { font-size: 14px; font-weight: 500; color: var(--text-1); }
-  .commercial-category {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--text-3);
-    margin-top: 2px;
-  }
+  .commercial-category { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); margin-top: 2px; }
 
   .commercial-rev {
     font-family: 'DM Mono', monospace;
@@ -658,10 +608,7 @@
     margin-top: 8px;
   }
 
-  .commercial-pitch::before {
-    content: '💬 ';
-    font-size: 11px;
-  }
+  .commercial-pitch::before { content: '💬 '; font-size: 11px; }
 
   /* Demographics */
   .demo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
@@ -679,11 +626,7 @@
   /* Collateral */
   .collateral-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
-  .collateral-card {
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-  }
+  .collateral-card { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
 
   .collateral-header {
     background: var(--navy);
@@ -696,47 +639,20 @@
   }
 
   .collateral-body { padding: 16px; }
-
-  .collateral-headline {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1rem;
-    color: var(--navy-deep);
-    margin-bottom: 4px;
-  }
-
-  .collateral-sub {
-    font-size: 12px;
-    color: var(--text-3);
-    margin-bottom: 12px;
-  }
-
+  .collateral-headline { font-family: 'DM Serif Display', serif; font-size: 1rem; color: var(--navy-deep); margin-bottom: 4px; }
+  .collateral-sub { font-size: 12px; color: var(--text-3); margin-bottom: 12px; }
   .collateral-bullets { list-style: none; margin-bottom: 12px; }
 
   .collateral-bullets li {
     font-size: 12.5px;
     color: var(--text-2);
     padding: 3px 0;
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
+    display: flex; align-items: flex-start; gap: 8px;
   }
 
-  .collateral-bullets li::before {
-    content: '→';
-    color: var(--gold);
-    flex-shrink: 0;
-    font-size: 11px;
-    margin-top: 2px;
-  }
+  .collateral-bullets li::before { content: '→'; color: var(--gold); flex-shrink: 0; font-size: 11px; margin-top: 2px; }
 
-  .collateral-cta {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--navy);
-    background: var(--navy-pale);
-    padding: 8px 12px;
-    border-radius: 6px;
-  }
+  .collateral-cta { font-size: 12px; font-weight: 500; color: var(--navy); background: var(--navy-pale); padding: 8px 12px; border-radius: 6px; }
 
   /* Reputation recs */
   .rec-list { display: flex; flex-direction: column; gap: 8px; }
@@ -766,7 +682,6 @@
     flex-shrink: 0;
   }
 
-  /* Animations */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(14px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -806,7 +721,7 @@
     <div class="loading-card">
       <div class="loading-icon">📊</div>
       <div class="loading-title">Building your Market Growth Strategy</div>
-      <p class="loading-sub">We're reading real customer reviews, scanning your competitive landscape, and pulling live market data — then synthesizing everything into a personalized strategy. This takes about <strong>90–120 seconds</strong> and replaces what used to take days of manual research.</p>
+      <p class="loading-sub">We're analyzing your market and building a personalized growth strategy for your location. This takes about <strong>90–120 seconds</strong>.</p>
       <div class="loading-steps">
         <div class="loading-step" id="step-1">
           <div class="step-dot" id="dot-1">1</div>
@@ -814,23 +729,23 @@
         </div>
         <div class="loading-step" id="step-2">
           <div class="step-dot" id="dot-2">2</div>
-          <span>Reading competitor reviews &amp; ratings</span>
+          <span>Analyzing your local market</span>
         </div>
         <div class="loading-step" id="step-3">
           <div class="step-dot" id="dot-3">3</div>
-          <span>Analyzing nearby apartment complexes</span>
+          <span>Researching your competitive landscape</span>
         </div>
         <div class="loading-step" id="step-4">
           <div class="step-dot" id="dot-4">4</div>
-          <span>Mapping commercial account targets</span>
+          <span>Identifying growth opportunities</span>
         </div>
         <div class="loading-step" id="step-5">
           <div class="step-dot" id="dot-5">5</div>
-          <span>AI synthesizing your growth strategy</span>
+          <span>Building your personalized strategy</span>
         </div>
       </div>
       <div style="margin-top:24px;padding:12px 16px;background:var(--navy-pale);border-radius:var(--radius-sm);font-size:12px;color:var(--navy);line-height:1.6;text-align:left;">
-        💡 <strong>Why does this take time?</strong> We're analyzing hundreds of real customer reviews, pulling live Google Business data, and running Census demographics — the same research that previously took consultants days to compile manually.
+        💡 <strong>Why does this take time?</strong> FranchiseIQ runs a deep analysis of your specific location — the same work that previously took consultants days to compile manually.
       </div>
     </div>
   </div>
@@ -914,7 +829,7 @@
 
     var html = '';
 
-    // ── 1. Report Header (blue) ──
+    // ── 1. Report Header ──
     html += '<div class="report-header fade-in">';
     html += '<div class="report-header-top">';
     html += '<div>';
@@ -940,23 +855,19 @@
       html += '<div class="section-card-header"><div class="section-icon">🏪</div><div><div class="section-title">Your Business Profile & Reputation</div><div class="section-subtitle">Your market position, customer reputation, and immediate opportunities</div></div></div>';
       html += '<div class="section-body">';
 
-      // Headline
       if (store.headline) html += '<div class="summary-text" style="font-weight:500;color:var(--navy-deep);font-size:15px;margin-bottom:16px;">' + store.headline + '</div>';
 
-      // Stats row
       html += '<div class="demo-grid" style="margin-bottom:16px;">';
       if (store.rating) html += '<div class="demo-stat"><div class="demo-value" style="color:var(--gold);">★ ' + store.rating + '</div><div class="demo-label">Google Rating</div></div>';
       if (store.reviewCount) html += '<div class="demo-stat"><div class="demo-value">' + store.reviewCount + '</div><div class="demo-label">Google Reviews</div></div>';
       if (store.washers || store.dryers) html += '<div class="demo-stat"><div class="demo-value">' + safe(store.washers,'?') + '/' + safe(store.dryers,'?') + '</div><div class="demo-label">Washers/Dryers</div></div>';
       html += '</div>';
 
-      // Rating vs market
       if (store.ratingVsMarket || store.ratingContext) {
         html += '<div class="sub-label">Rating vs. Market</div>';
         html += '<div style="background:var(--gold-pale);border-radius:var(--radius-sm);padding:14px 16px;font-size:13px;color:var(--text-2);line-height:1.65;border:1px solid rgba(201,131,42,0.2);margin-bottom:16px;">' + (store.ratingVsMarket || store.ratingContext) + '</div>';
       }
 
-      // Review themes
       if (store.reviewThemes && store.reviewThemes.length > 0) {
         html += '<div class="sub-label">What Your Customers Are Saying</div>';
         html += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">';
@@ -970,7 +881,6 @@
         html += '</div>';
       }
 
-      // Staff advantage
       if (store.staffAdvantage) {
         html += '<div style="background:var(--navy);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px;">';
         html += '<div style="font-family:monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:6px;">Staff Advantage</div>';
@@ -978,7 +888,6 @@
         html += '</div>';
       }
 
-      // One gap
       if (store.oneGap) {
         html += '<div style="background:#fde8e8;border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px;border:1px solid rgba(192,57,43,0.15);">';
         html += '<div style="font-size:11px;font-weight:500;color:var(--danger);margin-bottom:4px;font-family:monospace;letter-spacing:0.08em;text-transform:uppercase;">One Gap to Address</div>';
@@ -986,7 +895,6 @@
         html += '</div>';
       }
 
-      // Immediate opportunity
       if (store.immediateOpportunity) {
         html += '<div style="background:var(--navy);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px;">';
         html += '<div style="font-family:monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:6px;">#1 Priority This Week</div>';
@@ -994,7 +902,6 @@
         html += '</div>';
       }
 
-      // Tactical actions
       if (store.tacticalActions && store.tacticalActions.length > 0) {
         html += '<div class="sub-label">Tactical Action Items</div>';
         html += '<div class="rec-list">';
@@ -1004,7 +911,6 @@
         html += '</div>';
       }
 
-      // Fallback: old tacticalActions from reputationAudit
       if ((!store.tacticalActions || store.tacticalActions.length === 0) && rep.recommendations && rep.recommendations.length > 0) {
         html += '<div class="sub-label">Tactical Action Items</div>';
         html += '<div class="rec-list">';
@@ -1039,7 +945,7 @@
       html += '</div></div>';
     }
 
-    // ── Section 1: Competitive Landscape ──
+    // ── 4. Competitive Landscape ──
     html += '<div class="section-card fade-in">';
     html += '<div class="section-card-header"><div class="section-icon">🏆</div><div><div class="section-title">Competitive Landscape</div><div class="section-subtitle">Direct competitors within your market radius</div></div></div>';
     html += '<div class="section-body">';
@@ -1071,7 +977,7 @@
     }
     html += '</div></div>';
 
-    // ── Section 2: Apartment Opportunity ──
+    // ── 5. Apartment Opportunity ──
     html += '<div class="section-card fade-in">';
     html += '<div class="section-card-header"><div class="section-icon">🏢</div><div><div class="section-title">Apartment Ecosystem</div><div class="section-subtitle">Residential outreach opportunity</div></div></div>';
     html += '<div class="section-body">';
@@ -1102,7 +1008,7 @@
     }
     html += '</div></div>';
 
-    // ── Section 5: Commercial Targets ──
+    // ── 6. Commercial Targets ──
     html += '<div class="section-card fade-in">';
     html += '<div class="section-card-header"><div class="section-icon">🎯</div><div><div class="section-title">Commercial Account Targets</div><div class="section-subtitle">Nearby businesses with wash & fold potential</div></div></div>';
     html += '<div class="section-body">';
@@ -1144,7 +1050,7 @@
     }
     html += '</div></div>';
 
-    // ── 8. Marketing Action Plan ──
+    // ── 7. Marketing Action Plan ──
     html += '<div class="section-card fade-in">';
     html += '<div class="section-card-header"><div class="section-icon">📋</div><div><div class="section-title">Marketing Action Plan</div><div class="section-subtitle">Prioritized tactics ranked by revenue impact</div></div></div>';
     html += '<div class="section-body">';
@@ -1171,7 +1077,6 @@
       html += '</div>';
     }
 
-    // Budget
     if (budget.breakdown && budget.breakdown.length > 0) {
       html += '<div class="sub-label">Budget Allocation</div>';
       if (budget.total) html += '<div class="budget-total">' + budget.total + '</div>';
@@ -1185,17 +1090,16 @@
       html += '</div>';
     }
 
-    // 90-day checklist
     if (checklist.week1_2 || checklist.month1) {
       html += '<div class="sub-label">90-Day Checklist</div>';
       html += '<div class="checklist-grid">';
-      var phases = [
+      var checkPhases = [
         { key: 'week1_2', label: 'Weeks 1–2', items: checklist.week1_2 },
-        { key: 'month1', label: 'Month 1', items: checklist.month1 },
-        { key: 'month2', label: 'Month 2', items: checklist.month2 },
-        { key: 'month3', label: 'Month 3', items: checklist.month3 }
+        { key: 'month1',  label: 'Month 1',   items: checklist.month1 },
+        { key: 'month2',  label: 'Month 2',   items: checklist.month2 },
+        { key: 'month3',  label: 'Month 3',   items: checklist.month3 }
       ];
-      phases.forEach(function(p) {
+      checkPhases.forEach(function(p) {
         if (!p.items || p.items.length === 0) return;
         html += '<div class="checklist-phase">';
         html += '<div class="phase-label">' + p.label + '</div>';
@@ -1209,9 +1113,7 @@
 
     html += '</div></div>';
 
-
-
-    // ── Section 6: Collateral ──
+    // ── 8. Collateral ──
     if (onePager.headline || doorHanger.headline) {
       html += '<div class="section-card fade-in">';
       html += '<div class="section-card-header"><div class="section-icon">📄</div><div><div class="section-title">Print-Ready Collateral</div><div class="section-subtitle">Ready to print and distribute</div></div></div>';
@@ -1251,10 +1153,23 @@
       html += '</div></div></div>';
     }
 
-    // Back link
+    // ── Print Collateral Buttons ──
+    html += '<div style="background:var(--white);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:24px 28px;margin-bottom:20px;" class="fade-in">';
+    html += '<div style="font-family:\'DM Mono\',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-3);margin-bottom:16px;">Print-Ready Collateral</div>';
+    html += '<div style="display:flex;gap:12px;flex-wrap:wrap;">';
+    html += '<button onclick="openCollateral(\'commercial\')" style="flex:1;min-width:200px;padding:14px 20px;background:var(--navy);color:white;border:none;border-radius:var(--radius-sm);font-family:\'Outfit\',sans-serif;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">📄 Open Commercial One-Pager</button>';
+    html += '<button onclick="openCollateral(\'flyer\')" style="flex:1;min-width:200px;padding:14px 20px;background:var(--teal,#0F7173);color:white;border:none;border-radius:var(--radius-sm);font-family:\'Outfit\',sans-serif;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">🏢 Open Apartment Door Hanger</button>';
+    html += '</div>';
+    html += '<div style="font-size:11px;color:var(--text-3);margin-top:10px;font-family:\'DM Mono\',monospace;">Opens in a new tab · populated with your report data · use browser Print or Save as PDF</div>';
+    html += '</div>';
+
     html += '<div style="text-align:center;margin-top:32px;"><a href="/" style="font-size:13px;color:var(--text-3);text-decoration:none;">← Generate another report</a></div>';
 
     document.getElementById('report-state').innerHTML = html;
+
+    // Save report data to localStorage for collateral pages
+    try { localStorage.setItem('fiq_report', JSON.stringify(report)); } catch(e) {}
+
     document.getElementById('loading-state').style.display = 'none';
     document.getElementById('report-state').style.display = 'block';
   }
@@ -1269,7 +1184,14 @@
 
       formData = JSON.parse(stored);
 
-      // Step 1 & 2: Research
+      // Retrieve auth token — required for all API calls
+      var token = '';
+      try { token = localStorage.getItem('fiq_token') || ''; } catch(e) {}
+      if (!token) {
+        showError('Session expired. Please go back and log in again.');
+        return;
+      }
+
       setStep(1, 'active');
       setTimeout(function() { setStep(2, 'active'); }, 1500);
       setTimeout(function() { setStep(3, 'active'); }, 3000);
@@ -1278,10 +1200,16 @@
       var researchRes = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'research', address: formData.address })
+        body: JSON.stringify({ type: 'research', address: formData.address, token: token })
       });
 
       var researchJson = await researchRes.json();
+
+      if (researchRes.status === 401) {
+        showError('Session expired. Please go back and log in again.');
+        try { localStorage.removeItem('fiq_token'); } catch(e) {}
+        return;
+      }
 
       if (!researchJson.success || !researchJson.research) {
         showError('Could not retrieve local market data. Error: ' + (researchJson.error || 'Unknown error'));
@@ -1290,16 +1218,21 @@
 
       researchData = researchJson.research;
 
-      // Step 5: Synthesize
       setStep(5, 'active');
 
       var synthRes = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'synthesize', research: researchData, formData: formData })
+        body: JSON.stringify({ type: 'synthesize', research: researchData, formData: formData, token: token })
       });
 
       var synthJson = await synthRes.json();
+
+      if (synthRes.status === 401) {
+        showError('Session expired. Please go back and log in again.');
+        try { localStorage.removeItem('fiq_token'); } catch(e) {}
+        return;
+      }
 
       if (!synthJson.success || !synthJson.report) {
         showError('Could not generate strategy report. Error: ' + (synthJson.error || 'Unknown error'));
@@ -1313,7 +1246,14 @@
     }
   }
 
-  // Kick off on page load
+  function openCollateral(type) {
+    if (type === 'commercial') {
+      window.open('/collateral-commercial', '_blank');
+    } else {
+      window.open('/collateral-flyer', '_blank');
+    }
+  }
+
   window.addEventListener('load', function() {
     setStep(1, 'active');
     runPipeline();

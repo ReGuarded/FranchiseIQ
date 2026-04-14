@@ -1,4 +1,4 @@
-// FranchiseIQ v1.4
+// FranchiseIQ v1.6 — stateless token auth + 529 retry
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -6,9 +6,91 @@ module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
+  // ── Passwords — never sent to the browser ──
+  var PASSWORDS = {
+    'fiq-master-2026': 'master',
+    'fiq-guest-2026':  'guest'
+  };
+
+  // ── Token secret — used to sign and verify tokens without any shared memory ──
+  // Falls back to a hardcoded secret if env var not set (fine for beta)
+  var TOKEN_SECRET = process.env.FIQ_TOKEN_SECRET || 'fiq-secret-beta-2026';
+
+  // ── Simple stateless token: base64(payload) + "." + base64(signature) ──
+  // No JWT library needed — just HMAC-SHA256 via Node's built-in crypto
+  var crypto = require('crypto');
+
+  function makeToken(role) {
+    var payload = JSON.stringify({ role: role, iat: Date.now(), exp: Date.now() + 8 * 60 * 60 * 1000 });
+    var b64payload = Buffer.from(payload).toString('base64');
+    var sig = crypto.createHmac('sha256', TOKEN_SECRET).update(b64payload).digest('base64');
+    return b64payload + '.' + sig;
+  }
+
+  function verifyToken(token) {
+    if (!token || typeof token !== 'string') return null;
+    var parts = token.split('.');
+    if (parts.length !== 2) return null;
+    var b64payload = parts[0];
+    var sig = parts[1];
+    // Verify signature
+    var expectedSig = crypto.createHmac('sha256', TOKEN_SECRET).update(b64payload).digest('base64');
+    if (sig !== expectedSig) return null;
+    // Decode and check expiry
+    try {
+      var payload = JSON.parse(Buffer.from(b64payload, 'base64').toString());
+      if (Date.now() > payload.exp) return null; // expired
+      return payload;
+    } catch(e) { return null; }
+  }
+
+  // ── Anthropic fetch with 529 retry ──
+  async function callAnthropic(payload, retries, delayMs) {
+    retries = retries || 3;
+    delayMs = delayMs || 4000;
+    var lastRes = null;
+    for (var attempt = 1; attempt <= retries; attempt++) {
+      var aiRes = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (aiRes.status !== 529) return aiRes;
+      lastRes = aiRes;
+      if (attempt < retries) {
+        console.warn('Anthropic 529 — attempt ' + attempt + '/' + retries + ', retrying in ' + delayMs + 'ms');
+        await new Promise(function(resolve) { setTimeout(resolve, delayMs); });
+      }
+    }
+    return lastRes;
+  }
+
   try {
     const body = req.body || {};
     const { type } = body;
+
+    // ── AUTH ──
+    if (type === 'auth') {
+      var password = (body.password || '').trim();
+      var role = PASSWORDS[password];
+      if (!role) {
+        return res.status(200).json({ success: false, error: 'Invalid password' });
+      }
+      var token = makeToken(role);
+      return res.status(200).json({ success: true, token: token, role: role });
+    }
+
+    // ── TOKEN GUARD — verify on every research/synthesize call ──
+    if (type === 'research' || type === 'synthesize') {
+      var payload = verifyToken(body.token);
+      if (!payload) {
+        return res.status(401).json({ error: 'Unauthorized — please log in again.' });
+      }
+    }
 
     // ── RESEARCH PIPELINE ──
     if (type === 'research') {
@@ -214,24 +296,20 @@ module.exports = async function handler(req, res) {
         ownerText = 'Name: ' + (op.name || 'N/A') + '\nRating: ' + (op.rating ? op.rating + ' stars' : 'N/A') + '\nReviews: ' + (op.reviewCount || 'N/A') + '\nPhone: ' + (op.phone || 'N/A') + (revLines ? '\nSample reviews:\n' + revLines : '');
       }
 
-      // Build the JSON template as a proper JS object then stringify — no escaping issues
       var jsonTemplate = {
         businessProfile: {
           headline: "One sharp sentence on market position — reference actual rating vs named competitors",
-          rating: "X.X",
-          reviewCount: "XXX",
-          washers: "XX",
-          dryers: "XX",
-          ratingVsMarket: "2-3 sentences comparing rating directly to every named competitor — be specific about the gap",
+          rating: "X.X", reviewCount: "XXX", washers: "XX", dryers: "XX",
+          ratingVsMarket: "2-3 sentences comparing rating directly to every named competitor",
           reviewThemes: [
-            { theme: "Cleanliness", sampleQuote: "actual quote from their own Google reviews", marketingImplication: "what to do with this insight" },
+            { theme: "Cleanliness", sampleQuote: "actual quote", marketingImplication: "implication" },
             { theme: "Staff warmth", sampleQuote: "quote mentioning staff by name if available", marketingImplication: "implication" },
             { theme: "Machine quality or other prominent theme", sampleQuote: "quote", marketingImplication: "implication" }
           ],
-          staffAdvantage: "If any staff mentioned by name in reviews (e.g. Nora, Jessica) call them out specifically — named staff are a marketing moat. If no names found, describe the personal service advantage.",
-          oneGap: "The single honest weakness to address — e.g. payment friction, limited hours, low social media presence",
+          staffAdvantage: "Named staff are a marketing moat — call them out specifically if found in reviews.",
+          oneGap: "The single honest weakness to address",
           immediateOpportunity: "The single most important action in the next 7 days",
-          tacticalActions: ["Specific tactical action 1", "Specific action 2", "Specific action 3", "Specific action 4"]
+          tacticalActions: ["Action 1", "Action 2", "Action 3", "Action 4"]
         },
         locationSummary: {
           headline: "Sharp specific sentence on biggest market opportunity",
@@ -242,64 +320,58 @@ module.exports = async function handler(req, res) {
         marketResearch: {
           demographics: {
             headline: "What the demographic profile means for this business",
-            renterPercentage: "XX%",
-            totalPopulation: "XX,XXX",
-            medianIncome: "$XX,XXX",
+            renterPercentage: "XX%", totalPopulation: "XX,XXX", medianIncome: "$XX,XXX",
             housingEra: "description",
-            keyInsight: "2-3 sentences on what these numbers mean for laundromat demand here"
+            keyInsight: "2-3 sentences on what these numbers mean for laundromat demand"
           },
           competitorAnalysis: {
-            summary: "3-4 sentences on competitive landscape referencing specific names and review weaknesses",
+            summary: "3-4 sentences on competitive landscape",
             competitors: [
-              { name: "exact name", address: "address", distanceLabel: "X.X miles away", rating: 4.2, reviewCount: 180, threat: "High/Medium/Low", weakness: "Specific weakness from review text", opportunityAngle: "How this creates an opening" }
+              { name: "exact name", address: "address", distanceLabel: "X.X miles away", rating: 4.2, reviewCount: 180, threat: "High/Medium/Low", weakness: "Specific weakness from reviews", opportunityAngle: "How this creates an opening" }
             ],
             competitiveAdvantage: "2-3 sentences on this owner's specific advantages"
           },
           apartmentOpportunity: {
-            summary: "3-4 sentences referencing specific complex names, distances, and laundry frustration signals",
-            totalComplexes: 5,
-            estimatedHouseholds: 1000,
-            monthlyLaundrySpend: "$20,000",
+            summary: "3-4 sentences referencing specific complexes",
+            totalComplexes: 5, estimatedHouseholds: 1000, monthlyLaundrySpend: "$20,000",
             topTargets: [
-              { name: "exact name", address: "address", distanceLabel: "X.X miles away", priority: "High/Medium/Low", rating: 3.0, reviewCount: 197, laundryFrustration: "Specific complaint from reviews or proximity rationale", reason: "Why this complex is a priority" }
+              { name: "exact name", address: "address", distanceLabel: "X.X miles away", priority: "High/Medium/Low", rating: 3.0, reviewCount: 197, laundryFrustration: "Specific complaint or proximity rationale", reason: "Why this complex is a priority" }
             ]
           }
         },
         marketingActionPlan: {
-          summary: "2-3 sentences referencing specific market conditions and stated budget",
+          summary: "2-3 sentences referencing market conditions and stated budget",
           tactics: [
-            { rank: 1, title: "Tactic name", category: "Apartment Outreach / Commercial / Digital / In-Store", description: "3-4 sentences with specific names and actionable steps", effort: "Low/Medium/High", impact: "Low/Medium/High", timeframe: "Week 1-2 / Month 1 / Ongoing", estimatedMonthlyRevenue: "$X,XXX-X,XXX" }
+            { rank: 1, title: "Tactic name", category: "Apartment Outreach / Commercial / Digital / In-Store", description: "3-4 sentences with specific names and steps", effort: "Low/Medium/High", impact: "Low/Medium/High", timeframe: "Week 1-2 / Month 1 / Ongoing", estimatedMonthlyRevenue: "$X,XXX-X,XXX" }
           ],
           budgetAllocation: {
             total: "Must match stated budget",
             breakdown: [{ category: "name", amount: "$XX", rationale: "specific rationale" }]
           },
           checklist90Day: {
-            week1_2: ["action naming real businesses", "action 2", "action 3"],
+            week1_2: ["action 1", "action 2", "action 3"],
             month1: ["action 1", "action 2", "action 3"],
             month2: ["action 1", "action 2"],
             month3: ["action 1", "action 2"]
           }
         },
         commercialTargets: {
-          summary: "3-4 sentences on commercial opportunity referencing specific categories and distance clusters",
+          summary: "3-4 sentences on commercial opportunity",
           totalEstimatedMonthlyRevenue: "$X,XXX-X,XXX",
           outreachPhases: {
-            phase1: "Week 1 — name specific same-block or walking-distance targets",
-            phase2: "Month 1 — name under-1-mile targets by name and category",
+            phase1: "Week 1 — name specific same-block targets",
+            phase2: "Month 1 — name under-1-mile targets",
             phase3: "Month 2 — describe 1-2 mile targets"
           },
           targets: [
-            { businessName: "exact name", category: "Hotel/Gym/Medical/Restaurant/Salon/Auto/Daycare", address: "address", distanceLabel: "X.X miles away", priority: "High/Medium/Low", estimatedMonthlyRevenue: "$XXX-XXX", pitchAngle: "Specific pitch for this business", bestApproachTime: "When and how to approach" }
+            { businessName: "exact name", category: "Hotel/Gym/Medical/Restaurant/Salon/Auto/Daycare", address: "address", distanceLabel: "X.X miles away", priority: "High/Medium/Low", estimatedMonthlyRevenue: "$XXX-XXX", pitchAngle: "Specific pitch", bestApproachTime: "When and how to approach" }
           ]
         },
         collateral: {
           onePager: {
-            headline: "Compelling commercial headline",
-            subheadline: "Supporting line",
+            headline: "Compelling commercial headline", subheadline: "Supporting line",
             bulletPoints: ["benefit 1", "benefit 2", "benefit 3", "benefit 4"],
-            callToAction: "Specific CTA",
-            contactPrompt: "How to reach out"
+            callToAction: "Specific CTA", contactPrompt: "How to reach out"
           },
           doorHanger: {
             headline: "Headline referencing proximity to closest apartments",
@@ -312,13 +384,9 @@ module.exports = async function handler(req, res) {
 
       var promptParts = [
         'Analyze this WaveMAX Laundry franchise. Use review text for intelligence. Use Census data for demographics. Use distances to sequence outreach.',
-        '',
-        'FRANCHISE: ' + research.address,
-        '',
-        'OWNER GOOGLE PROFILE (auto-retrieved):',
-        ownerText,
-        '',
-        'OWNER CONTEXT:',
+        '', 'FRANCHISE: ' + research.address,
+        '', 'OWNER GOOGLE PROFILE (auto-retrieved):', ownerText,
+        '', 'OWNER CONTEXT:',
         '- Brand: ' + (formData.brand === 'wavemax' ? 'WaveMAX Laundry' : formData.brand),
         '- Washers: ' + (formData.washers || 'N/A'),
         '- Dryers: ' + (formData.dryers || 'N/A'),
@@ -326,52 +394,37 @@ module.exports = async function handler(req, res) {
         '- Budget: ' + budgetText,
         '- Challenges: ' + challengesText,
         '- Marketing: ' + marketingText,
-        '',
-        'DEMOGRAPHICS:',
-        demoText,
-        '',
-        'COMPETITORS (sorted by distance — list minimum 5):',
-        summarize('competitors'),
-        '',
-        'APARTMENTS (sorted closest first — list minimum 5, prioritize low-rated with laundry complaints):',
-        summarize('apartments'),
-        '',
-        'HOTELS:',
-        summarize('hotels'),
-        '',
-        'GYMS:',
-        summarize('gyms'),
-        '',
-        'MEDICAL & DENTAL:',
-        summarize('medical'),
-        '',
-        'RESTAURANTS:',
-        summarize('restaurants'),
-        '',
-        'SALONS & SPAS:',
-        summarize('salons'),
-        '',
-        'AUTO REPAIR SHOPS:',
-        summarize('automotive'),
-        '',
-        'DAYCARES & CHILDCARE:',
-        summarize('daycares'),
-        '',
-        'Return ONLY valid JSON matching this exact structure (replace all placeholder values with real data):',
-        '',
-        JSON.stringify(jsonTemplate, null, 2)
+        '', 'DEMOGRAPHICS:', demoText,
+        '', 'COMPETITORS (sorted by distance — list minimum 5):', summarize('competitors'),
+        '', 'APARTMENTS (sorted closest first — list minimum 5, prioritize low-rated with laundry complaints):', summarize('apartments'),
+        '', 'HOTELS:', summarize('hotels'),
+        '', 'GYMS:', summarize('gyms'),
+        '', 'MEDICAL & DENTAL:', summarize('medical'),
+        '', 'RESTAURANTS:', summarize('restaurants'),
+        '', 'SALONS & SPAS:', summarize('salons'),
+        '', 'AUTO REPAIR SHOPS:', summarize('automotive'),
+        '', 'DAYCARES & CHILDCARE:', summarize('daycares'),
+        '', 'Return ONLY valid JSON matching this exact structure (replace all placeholder values with real data):',
+        '', JSON.stringify(jsonTemplate, null, 2)
       ];
 
       var prompt = promptParts.join('\n');
 
-      var aiRes = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
-        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 6000, system: systemPrompt, messages: [{ role: 'user', content: prompt }] })
+      var aiRes = await callAnthropic({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 6000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: prompt }]
       });
 
       var aiData = await aiRes.json();
-      if (!aiRes.ok) return res.status(aiRes.status).json({ error: aiData.error || 'AI API error' });
+
+      if (!aiRes.ok) {
+        if (aiRes.status === 529) {
+          return res.status(503).json({ error: 'Anthropic is currently overloaded. Please wait 30 seconds and try again.' });
+        }
+        return res.status(aiRes.status).json({ error: aiData.error || 'AI API error' });
+      }
 
       var text = (aiData.content || []).filter(function(b) { return b.type === 'text'; }).map(function(b) { return b.text; }).join('');
 
@@ -390,4 +443,3 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: { message: err.message } });
   }
 };
-

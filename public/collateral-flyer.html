@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<!-- FranchiseIQ — Apartment Flyer (Print-Ready, 2-Up Half Sheet) -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WaveMAX Laundry – Apartment Flyer</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:      #1B3A6B;
+    --teal:      #0F7173;
+    --teal-mid:  #167D7F;
+    --teal-lt:   #D4EEEE;
+    --gold:      #C8963E;
+    --gold-lt:   #FEF3CD;
+    --ink:       #1E1E1E;
+    --muted:     #5A6070;
+    --offwhite:  #F6F9FB;
+    --white:     #FFFFFF;
+    --cut:       #BBCCD8;
+  }
+
+  @page { size: letter; margin: 0; }
+
+  html, body {
+    width: 8.5in;
+    background: #D6DDE4;
+    font-family: 'Outfit', sans-serif;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ── PRINT TOOLBAR (screen only) ── */
+  .print-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #1B3A6B;
+    padding: 10px 20px;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 999;
+  }
+
+  .print-toolbar-label {
+    font-family: 'Outfit', sans-serif;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.05em;
+  }
+
+  .print-toolbar-label strong { color: white; }
+
+  .print-btn {
+    background: #C8963E;
+    color: white;
+    border: none;
+    padding: 8px 22px;
+    border-radius: 6px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+  }
+
+  .print-btn:hover { background: #b07e2e; }
+
+  @media print {
+    .print-toolbar { display: none; }
+    html, body { background: white; }
+  }
+
+  @media screen {
+    body { padding-top: 52px; padding-bottom: 0.25in; }
+    .sheet { box-shadow: 0 6px 48px rgba(0,0,0,0.2); margin: 0.25in auto 0; }
+  }
+
+  /* ── SHEET ── */
+  .sheet {
+    width: 8.5in;
+    height: 11in;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .cut-line {
+    height: 0;
+    border-top: 1pt dashed var(--cut);
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .cut-label {
+    position: absolute;
+    left: 50%;
+    top: -8px;
+    transform: translateX(-50%);
+    background: white;
+    padding: 0 6px;
+    font-size: 6.5pt;
+    font-family: 'Outfit', sans-serif;
+    color: var(--cut);
+    letter-spacing: 0.1em;
+    white-space: nowrap;
+  }
+
+  /* ── SINGLE FLYER ── */
+  .flyer {
+    width: 8.5in;
+    height: 5.5in;
+    display: grid;
+    grid-template-columns: 2.9in 1fr;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  /* ── LEFT PANEL ── */
+  .left-panel {
+    background: var(--navy);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 0.32in 0.3in 0.3in 0.38in;
+  }
+
+  .wave-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.07);
+    pointer-events: none;
+  }
+
+  .ring1 { width: 3.8in; height: 3.8in; bottom: -1.4in; left: -1.2in; }
+  .ring2 { width: 2.6in; height: 2.6in; bottom: -0.8in; left: -0.7in; border-color: rgba(255,255,255,0.05); }
+  .ring3 { width: 1.4in; height: 1.4in; bottom: -0.3in; left: -0.2in; border-color: rgba(255,255,255,0.08); }
+  .ring4 { width: 5in; height: 5in; top: -3in; right: -2.5in; border-color: rgba(15,113,115,0.18); }
+
+  .slash {
+    position: absolute;
+    top: 0; right: 0;
+    width: 0; height: 0;
+    border-style: solid;
+    border-width: 0 0.55in 0.55in 0;
+    border-color: transparent var(--teal-mid) transparent transparent;
+  }
+
+  .brand-eyebrow {
+    font-size: 6.5pt;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(139,191,234,0.9);
+    margin-bottom: 0.1in;
+  }
+
+  .brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 26pt;
+    font-weight: 900;
+    color: var(--white);
+    line-height: 0.95;
+    margin-bottom: 0.06in;
+  }
+
+  .brand-name em {
+    font-style: italic;
+    color: rgba(255,255,255,0.65);
+    font-size: 16pt;
+    display: block;
+    margin-top: 0.02in;
+  }
+
+  .brand-tagline {
+    font-size: 8pt;
+    font-weight: 300;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.5;
+    margin-top: 0.1in;
+    max-width: 2in;
+  }
+
+  .stars-block { display: flex; align-items: center; gap: 0.06in; margin-top: 0.14in; }
+  .stars { font-size: 11pt; color: var(--gold); letter-spacing: 0.03em; }
+  .stars-label { font-size: 7.5pt; color: rgba(255,255,255,0.55); font-weight: 300; }
+
+  .proximity {
+    background: var(--teal-mid);
+    border-radius: 4px;
+    padding: 0.1in 0.13in;
+    display: flex;
+    align-items: center;
+    gap: 0.08in;
+  }
+
+  .prox-icon { font-size: 14pt; line-height: 1; }
+  .prox-main { font-size: 8.5pt; font-weight: 700; color: var(--white); display: block; line-height: 1.2; }
+  .prox-sub { font-size: 7pt; font-weight: 300; color: rgba(255,255,255,0.72); display: block; }
+
+  .hours-pill { display: flex; align-items: center; gap: 0.06in; margin-top: 0.09in; }
+  .hours-dot { width: 6px; height: 6px; border-radius: 50%; background: #4CAF7E; flex-shrink: 0; }
+  .hours-text { font-size: 7.5pt; color: rgba(255,255,255,0.6); font-weight: 300; }
+
+  /* ── RIGHT PANEL ── */
+  .right-panel {
+    background: var(--offwhite);
+    display: flex;
+    flex-direction: column;
+    padding: 0.3in 0.38in 0.26in 0.32in;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .right-panel::before {
+    content: '';
+    position: absolute;
+    top: -0.5in; right: -0.5in;
+    width: 2.5in; height: 2.5in;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(15,113,115,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .offer-box {
+    background: var(--navy);
+    border-radius: 8px;
+    padding: 0.18in 0.2in;
+    margin-bottom: 0.18in;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .offer-box::after {
+    content: '';
+    position: absolute;
+    bottom: 0; right: 0;
+    width: 1in; height: 1in;
+    background: radial-gradient(circle at bottom right, rgba(200,150,62,0.25) 0%, transparent 70%);
+  }
+
+  .offer-eyebrow { font-size: 6.5pt; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.04in; }
+  .offer-headline { font-family: 'Playfair Display', serif; font-size: 18pt; font-weight: 900; color: var(--white); line-height: 1.05; margin-bottom: 0.06in; }
+  .offer-headline span { color: var(--gold); }
+  .offer-detail { font-size: 8pt; color: rgba(255,255,255,0.65); font-weight: 300; line-height: 1.5; }
+  .offer-detail strong { color: rgba(255,255,255,0.9); font-weight: 500; }
+
+  .services-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.09in; margin-bottom: 0.16in; }
+
+  .svc {
+    background: var(--white);
+    border: 0.5pt solid #D6E2EA;
+    border-radius: 6px;
+    padding: 0.1in 0.12in;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.07in;
+  }
+
+  .svc-icon { font-size: 14pt; line-height: 1; flex-shrink: 0; margin-top: 1px; }
+  .svc-title { font-size: 8.5pt; font-weight: 700; color: var(--navy); display: block; margin-bottom: 1px; }
+  .svc-desc { font-size: 7pt; color: var(--muted); font-weight: 300; line-height: 1.4; }
+
+  .proof-row { display: flex; gap: 0.08in; margin-bottom: 0.15in; flex-wrap: wrap; }
+
+  .proof-chip {
+    background: var(--teal-lt);
+    border: 0.5pt solid rgba(15,113,115,0.2);
+    border-radius: 20px;
+    padding: 3px 9px;
+    font-size: 7pt;
+    font-weight: 500;
+    color: var(--teal);
+    white-space: nowrap;
+  }
+
+  .cta-row { display: grid; grid-template-columns: 1fr auto; gap: 0.1in; align-items: center; margin-top: auto; }
+
+  .cta-phone { font-family: 'Playfair Display', serif; font-size: 14pt; font-weight: 700; color: var(--navy); display: block; line-height: 1; margin-bottom: 0.04in; }
+  .cta-address { font-size: 7.5pt; color: var(--muted); font-weight: 300; line-height: 1.5; }
+
+  .cta-qr {
+    background: var(--white);
+    border: 0.5pt solid #D6E2EA;
+    border-radius: 6px;
+    width: 0.72in; height: 0.72in;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+    gap: 2px;
+    flex-shrink: 0;
+  }
+
+  .qr-placeholder { font-size: 22pt; line-height: 1; }
+  .qr-label { font-size: 5.5pt; color: var(--muted); font-weight: 500; letter-spacing: 0.05em; text-align: center; }
+
+  .disclaimer { margin-top: 0.08in; font-size: 6pt; color: #AAB4BE; font-weight: 300; line-height: 1.4; }
+</style>
+</head>
+<body>
+
+<!-- Print Toolbar (screen only) -->
+<div class="print-toolbar">
+  <div class="print-toolbar-label"><strong>Apartment Door Hanger</strong> — 2-up, half-sheet · Ready to print</div>
+  <button class="print-btn" onclick="window.print()">🖨 Print / Save as PDF</button>
+</div>
+
+<div class="sheet">
+
+  <!-- FLYER 1 -->
+  <div class="flyer" id="flyer1">
+    <div class="left-panel">
+      <div class="wave-ring ring1"></div>
+      <div class="wave-ring ring2"></div>
+      <div class="wave-ring ring3"></div>
+      <div class="wave-ring ring4"></div>
+      <div class="slash"></div>
+      <div class="left-top">
+        <div class="brand-eyebrow">Your Neighborhood Laundry</div>
+        <div class="brand-name">Wave<br>MAX<em>Laundry</em></div>
+        <div class="brand-tagline">Clean clothes. Friendly faces. Right around the corner.</div>
+        <div class="stars-block">
+          <span class="stars">★★★★★</span>
+          <span class="stars-label" id="stars-label-1">Loading...</span>
+        </div>
+      </div>
+      <div class="left-bottom">
+        <div class="proximity">
+          <div class="prox-icon">📍</div>
+          <div class="prox-text">
+            <span class="prox-main" id="prox-main-1">Loading...</span>
+            <span class="prox-sub" id="prox-sub-1">Minutes from your door</span>
+          </div>
+        </div>
+        <div class="hours-pill">
+          <div class="hours-dot"></div>
+          <span class="hours-text">Open every day · 7:00 AM – 10:00 PM</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="offer-box">
+        <div class="offer-eyebrow">✦ <span id="offer-eyebrow-1">New Neighbor Offer</span></div>
+        <div class="offer-headline" id="offer-headline-1">First Wash &amp; Fold<br><span>FREE</span> — up to 10 lbs</div>
+        <div class="offer-detail" id="offer-detail-1">Drop off your laundry. We wash, dry &amp; fold it.<br><strong>Pick it up fresh, clean &amp; ready.</strong> First order on us.</div>
+      </div>
+
+      <div class="services-row">
+        <div class="svc">
+          <div class="svc-icon">👕</div>
+          <div class="svc-body">
+            <span class="svc-title">Drop-Off Service</span>
+            <span class="svc-desc">We wash, dry &amp; fold — ready same or next day</span>
+          </div>
+        </div>
+        <div class="svc">
+          <div class="svc-icon">🌀</div>
+          <div class="svc-body">
+            <span class="svc-title">Self-Service</span>
+            <span class="svc-desc">High-efficiency machines. Always clean. Never crowded.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="proof-row" id="proof-row-1">
+        <div class="proof-chip">✓ Free WiFi</div>
+        <div class="proof-chip">✓ Full-time attendant</div>
+        <div class="proof-chip">✓ Eco-friendly washers</div>
+        <div class="proof-chip">✓ Large-capacity machines</div>
+      </div>
+
+      <div class="cta-row">
+        <div class="cta-contact">
+          <span class="cta-phone" id="cta-phone-1">(210) 314-3699</span>
+          <span class="cta-address" id="cta-address-1">Loading...</span>
+        </div>
+        <div class="cta-qr">
+          <div class="qr-placeholder">⬛</div>
+          <div class="qr-label">SCAN<br>FOR MAP</div>
+        </div>
+      </div>
+
+      <div class="disclaimer" id="disclaimer-1">*Offer valid for first-time customers only. Must present this flyer. While offer lasts.</div>
+    </div>
+  </div>
+
+  <!-- CUT LINE -->
+  <div class="cut-line"><span class="cut-label">✂ &nbsp; CUT HERE &nbsp; ✂</span></div>
+
+  <!-- FLYER 2 (identical) -->
+  <div class="flyer" id="flyer2">
+    <div class="left-panel">
+      <div class="wave-ring ring1"></div>
+      <div class="wave-ring ring2"></div>
+      <div class="wave-ring ring3"></div>
+      <div class="wave-ring ring4"></div>
+      <div class="slash"></div>
+      <div class="left-top">
+        <div class="brand-eyebrow">Your Neighborhood Laundry</div>
+        <div class="brand-name">Wave<br>MAX<em>Laundry</em></div>
+        <div class="brand-tagline">Clean clothes. Friendly faces. Right around the corner.</div>
+        <div class="stars-block">
+          <span class="stars">★★★★★</span>
+          <span class="stars-label" id="stars-label-2">Loading...</span>
+        </div>
+      </div>
+      <div class="left-bottom">
+        <div class="proximity">
+          <div class="prox-icon">📍</div>
+          <div class="prox-text">
+            <span class="prox-main" id="prox-main-2">Loading...</span>
+            <span class="prox-sub" id="prox-sub-2">Minutes from your door</span>
+          </div>
+        </div>
+        <div class="hours-pill">
+          <div class="hours-dot"></div>
+          <span class="hours-text">Open every day · 7:00 AM – 10:00 PM</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <div class="offer-box">
+        <div class="offer-eyebrow">✦ <span id="offer-eyebrow-2">New Neighbor Offer</span></div>
+        <div class="offer-headline" id="offer-headline-2">First Wash &amp; Fold<br><span>FREE</span> — up to 10 lbs</div>
+        <div class="offer-detail" id="offer-detail-2">Drop off your laundry. We wash, dry &amp; fold it.<br><strong>Pick it up fresh, clean &amp; ready.</strong> First order on us.</div>
+      </div>
+
+      <div class="services-row">
+        <div class="svc">
+          <div class="svc-icon">👕</div>
+          <div class="svc-body">
+            <span class="svc-title">Drop-Off Service</span>
+            <span class="svc-desc">We wash, dry &amp; fold — ready same or next day</span>
+          </div>
+        </div>
+        <div class="svc">
+          <div class="svc-icon">🌀</div>
+          <div class="svc-body">
+            <span class="svc-title">Self-Service</span>
+            <span class="svc-desc">High-efficiency machines. Always clean. Never crowded.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="proof-row" id="proof-row-2">
+        <div class="proof-chip">✓ Free WiFi</div>
+        <div class="proof-chip">✓ Full-time attendant</div>
+        <div class="proof-chip">✓ Eco-friendly washers</div>
+        <div class="proof-chip">✓ Large-capacity machines</div>
+      </div>
+
+      <div class="cta-row">
+        <div class="cta-contact">
+          <span class="cta-phone" id="cta-phone-2">(210) 314-3699</span>
+          <span class="cta-address" id="cta-address-2">Loading...</span>
+        </div>
+        <div class="cta-qr">
+          <div class="qr-placeholder">⬛</div>
+          <div class="qr-label">SCAN<br>FOR MAP</div>
+        </div>
+      </div>
+
+      <div class="disclaimer" id="disclaimer-2">*Offer valid for first-time customers only. Must present this flyer. While offer lasts.</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  (function() {
+    try {
+      var reportRaw = localStorage.getItem('fiq_report');
+      var formRaw = localStorage.getItem('fiq_form_data');
+      if (!reportRaw || !formRaw) return;
+
+      var report = JSON.parse(reportRaw);
+      var form = JSON.parse(formRaw);
+
+      var store = report.businessProfile || {};
+      var apt = (report.marketResearch || {}).apartmentOpportunity || {};
+      var collateral = report.collateral || {};
+      var doorHanger = collateral.doorHanger || {};
+      var address = form.address || '';
+
+      // Short address (street only)
+      var shortAddress = address.split(',')[0] || address;
+
+      // Rating
+      var starsLabel = (store.rating || '4.8') + ' · ' + (store.reviewCount || '280+') + ' reviews';
+      document.getElementById('stars-label-1').textContent = starsLabel;
+      document.getElementById('stars-label-2').textContent = starsLabel;
+
+      // Address
+      document.getElementById('prox-main-1').textContent = shortAddress;
+      document.getElementById('prox-main-2').textContent = shortAddress;
+
+      // Proximity sub — use closest apartment if available
+      if (apt.topTargets && apt.topTargets.length > 0) {
+        var closest = apt.topTargets[0];
+        if (closest.distanceLabel) {
+          var sub = closest.distanceLabel + ' from ' + (closest.name || 'nearby apartments');
+          document.getElementById('prox-sub-1').textContent = sub;
+          document.getElementById('prox-sub-2').textContent = sub;
+        }
+      }
+
+      // Offer headline
+      if (doorHanger.headline) {
+        var parts = doorHanger.headline.split(' ');
+        // Try to split into two lines naturally
+        document.getElementById('offer-headline-1').innerHTML = doorHanger.headline;
+        document.getElementById('offer-headline-2').innerHTML = doorHanger.headline;
+      }
+
+      // Offer line
+      if (doorHanger.offerLine) {
+        document.getElementById('offer-eyebrow-1').textContent = doorHanger.offerLine;
+        document.getElementById('offer-eyebrow-2').textContent = doorHanger.offerLine;
+      }
+
+      // Offer detail — use bullet points
+      if (doorHanger.bulletPoints && doorHanger.bulletPoints.length > 0) {
+        var detailHtml = doorHanger.bulletPoints.slice(0, 2).join('<br>');
+        document.getElementById('offer-detail-1').innerHTML = detailHtml;
+        document.getElementById('offer-detail-2').innerHTML = detailHtml;
+      }
+
+      // Proof chips — use bullet points as chips
+      if (doorHanger.bulletPoints && doorHanger.bulletPoints.length > 0) {
+        var chips = doorHanger.bulletPoints.slice(0, 4).map(function(b) {
+          return '<div class="proof-chip">✓ ' + b + '</div>';
+        }).join('');
+        // Only replace if we have meaningful chips
+        if (doorHanger.bulletPoints.length >= 3) {
+          document.getElementById('proof-row-1').innerHTML = chips;
+          document.getElementById('proof-row-2').innerHTML = chips;
+        }
+      }
+
+      // CTA — phone
+      if (report.ownerProfile && report.ownerProfile.phone) {
+        document.getElementById('cta-phone-1').textContent = report.ownerProfile.phone;
+        document.getElementById('cta-phone-2').textContent = report.ownerProfile.phone;
+      }
+
+      // CTA address
+      var ctaAddr = address + '\nwavemaxlaundry.com';
+      document.getElementById('cta-address-1').textContent = address;
+      document.getElementById('cta-address-2').textContent = address;
+
+      // Disclaimer — use callToAction if available
+      if (doorHanger.callToAction) {
+        document.getElementById('disclaimer-1').textContent = doorHanger.callToAction;
+        document.getElementById('disclaimer-2').textContent = doorHanger.callToAction;
+      }
+
+    } catch(e) {
+      console.warn('Could not load report data:', e);
+    }
+  })();
+</script>
+</body>
+</html>

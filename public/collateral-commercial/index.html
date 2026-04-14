@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<!-- FranchiseIQ — Commercial One-Pager (Print-Ready) -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WaveMAX Commercial Laundry — Partner Program</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --navy:    #1B3A6B;
+    --teal:    #0F7173;
+    --teal-lt: #E1F5F5;
+    --gold:    #C8963E;
+    --gold-lt: #FEF3CD;
+    --ink:     #2C2C2C;
+    --muted:   #666666;
+    --rule:    #D8E4ED;
+    --white:   #FFFFFF;
+    --offwhite:#F7F9FB;
+  }
+
+  @page { size: letter; margin: 0; }
+
+  html, body {
+    width: 8.5in;
+    min-height: 11in;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 10pt;
+    color: var(--ink);
+    background: var(--white);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* ── PRINT TOOLBAR (screen only) ── */
+  .print-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #1B3A6B;
+    padding: 10px 20px;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 999;
+  }
+
+  .print-toolbar-label {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: 0.05em;
+  }
+
+  .print-toolbar-label strong { color: white; }
+
+  .print-btn {
+    background: #C8963E;
+    color: white;
+    border: none;
+    padding: 8px 22px;
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+  }
+
+  .print-btn:hover { background: #b07e2e; }
+
+  @media print {
+    .print-toolbar { display: none; }
+    html, body { background: white; }
+  }
+
+  @media screen {
+    body { background: #E8EDF2; padding-top: 52px; padding-bottom: 0.3in; }
+    .page { box-shadow: 0 4px 40px rgba(0,0,0,0.18); margin: 0.3in auto 0; }
+  }
+
+  /* ── LAYOUT ── */
+  .page {
+    width: 8.5in;
+    min-height: 11in;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto auto;
+    position: relative;
+    background: white;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: var(--navy);
+    padding: 0.38in 0.55in 0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 0.3in;
+  }
+
+  .brand-tagline {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 7.5pt;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #8BBFEA;
+    margin-bottom: 0.07in;
+  }
+
+  .brand-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28pt;
+    color: var(--white);
+    line-height: 1;
+    margin-bottom: 0.06in;
+  }
+
+  .brand-address {
+    font-size: 8.5pt;
+    color: #A8C8E0;
+    font-weight: 300;
+    padding-bottom: 0.18in;
+  }
+
+  .header-badge {
+    background: var(--gold);
+    padding: 0.14in 0.22in 0.18in;
+    text-align: center;
+    align-self: end;
+    border-radius: 4px 4px 0 0;
+  }
+
+  .badge-stars {
+    font-size: 10pt;
+    color: var(--white);
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  .badge-label {
+    font-size: 7pt;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.82);
+  }
+
+  /* ── HERO BAND ── */
+  .hero-band {
+    background: var(--teal);
+    padding: 0.16in 0.55in;
+    display: flex;
+    align-items: center;
+    gap: 0.4in;
+  }
+
+  .hero-headline {
+    font-family: 'DM Serif Display', serif;
+    font-size: 14pt;
+    color: var(--white);
+    font-style: italic;
+    flex: 1;
+  }
+
+  .hero-sub {
+    font-size: 8pt;
+    color: rgba(255,255,255,0.78);
+    max-width: 2.4in;
+    line-height: 1.5;
+    font-weight: 300;
+    text-align: right;
+  }
+
+  /* ── BODY ── */
+  .body {
+    padding: 0.32in 0.55in 0.24in;
+    display: grid;
+    grid-template-columns: 1fr 2.5in;
+    gap: 0.32in;
+  }
+
+  /* ── LEFT COLUMN ── */
+  .section-label {
+    font-size: 6.5pt;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 0.07in;
+  }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 13pt;
+    color: var(--navy);
+    margin-bottom: 0.1in;
+    line-height: 1.2;
+  }
+
+  .intro-text {
+    font-size: 9pt;
+    color: var(--ink);
+    line-height: 1.65;
+    margin-bottom: 0.18in;
+    font-weight: 300;
+  }
+
+  .intro-text strong { color: var(--navy); font-weight: 600; }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.1in;
+    margin-bottom: 0.2in;
+  }
+
+  .service-card {
+    background: var(--offwhite);
+    border: 0.5pt solid var(--rule);
+    border-left: 2.5pt solid var(--teal);
+    padding: 0.1in 0.12in;
+    border-radius: 0 3px 3px 0;
+  }
+
+  .service-card-title { font-size: 8.5pt; font-weight: 600; color: var(--navy); margin-bottom: 2px; }
+  .service-card-desc { font-size: 7.5pt; color: var(--muted); line-height: 1.45; font-weight: 300; }
+
+  .why-title {
+    font-size: 6.5pt;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.08in;
+    margin-top: 0.04in;
+  }
+
+  .why-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.07in 0.15in;
+    margin-bottom: 0.2in;
+  }
+
+  .why-list li {
+    font-size: 8.5pt;
+    color: var(--ink);
+    padding-left: 0.14in;
+    position: relative;
+    line-height: 1.4;
+    font-weight: 300;
+  }
+
+  .why-list li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--teal);
+    font-weight: 600;
+    font-size: 8pt;
+  }
+
+  .testimonial {
+    background: var(--navy);
+    border-radius: 4px;
+    padding: 0.14in 0.18in;
+    margin-bottom: 0.18in;
+    position: relative;
+  }
+
+  .testimonial::before {
+    content: "\201C";
+    font-family: 'DM Serif Display', serif;
+    font-size: 36pt;
+    color: rgba(255,255,255,0.12);
+    position: absolute;
+    top: -0.02in;
+    left: 0.08in;
+    line-height: 1;
+  }
+
+  .testimonial-text {
+    font-size: 8pt;
+    color: rgba(255,255,255,0.88);
+    font-style: italic;
+    line-height: 1.55;
+    font-weight: 300;
+    padding-left: 0.08in;
+    margin-bottom: 0.06in;
+  }
+
+  .testimonial-attr { font-size: 7pt; color: #8BBFEA; font-weight: 500; letter-spacing: 0.05em; padding-left: 0.08in; }
+
+  .rule { border: none; border-top: 0.5pt solid var(--rule); margin: 0.14in 0; }
+
+  /* ── RIGHT COLUMN ── */
+  .pricing-box {
+    background: var(--offwhite);
+    border: 0.5pt solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.16in;
+  }
+
+  .pricing-header {
+    background: var(--navy);
+    padding: 0.1in 0.14in;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .pricing-header-title { font-size: 7.5pt; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--white); }
+  .pricing-header-tag { font-size: 6.5pt; background: var(--gold); color: var(--white); padding: 2px 6px; border-radius: 2px; font-weight: 600; letter-spacing: 0.05em; }
+
+  .pricing-row {
+    padding: 0.09in 0.14in;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0.1in;
+    align-items: center;
+    border-bottom: 0.5pt solid var(--rule);
+  }
+
+  .pricing-row:last-child { border-bottom: none; }
+  .pricing-row.alt { background: #EEF4F8; }
+  .pricing-item { font-size: 8.5pt; color: var(--ink); font-weight: 400; }
+  .pricing-item span { display: block; font-size: 7pt; color: var(--muted); font-weight: 300; margin-top: 1px; }
+  .pricing-value { font-size: 8.5pt; font-weight: 600; color: var(--teal); white-space: nowrap; text-align: right; }
+
+  .serve-box {
+    background: var(--teal-lt);
+    border: 0.5pt solid #B0D8D8;
+    border-radius: 4px;
+    padding: 0.13in 0.15in;
+    margin-bottom: 0.16in;
+  }
+
+  .serve-title { font-size: 6.5pt; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--teal); margin-bottom: 0.08in; }
+
+  .serve-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.05in 0.1in; }
+
+  .serve-item {
+    font-size: 8pt;
+    color: var(--ink);
+    padding-left: 0.12in;
+    position: relative;
+    line-height: 1.45;
+    font-weight: 400;
+  }
+
+  .serve-item::before { content: "→"; position: absolute; left: 0; color: var(--teal); font-size: 7pt; }
+
+  .offer-box {
+    background: var(--gold-lt);
+    border: 1pt solid var(--gold);
+    border-radius: 4px;
+    padding: 0.13in 0.15in;
+    margin-bottom: 0.16in;
+    text-align: center;
+  }
+
+  .offer-eyebrow { font-size: 6.5pt; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 0.04in; }
+
+  .offer-headline {
+    font-family: 'DM Serif Display', serif;
+    font-size: 13pt;
+    color: var(--navy);
+    margin-bottom: 0.04in;
+  }
+
+  .offer-detail { font-size: 7.5pt; color: var(--muted); line-height: 1.5; font-weight: 300; }
+
+  .contact-box { background: var(--navy); border-radius: 4px; padding: 0.14in 0.16in; }
+
+  .contact-title { font-size: 7pt; font-weight: 600; letter-spacing: 0.15em; text-transform: uppercase; color: #8BBFEA; margin-bottom: 0.1in; }
+
+  .contact-row { display: flex; align-items: baseline; gap: 0.08in; margin-bottom: 0.06in; }
+  .contact-row:last-child { margin-bottom: 0; }
+  .contact-icon { font-size: 8pt; width: 0.14in; flex-shrink: 0; color: var(--gold); }
+  .contact-label { font-size: 7pt; color: #8BBFEA; font-weight: 500; min-width: 0.5in; }
+  .contact-value { font-size: 8pt; color: var(--white); font-weight: 400; }
+
+  /* ── HOW IT WORKS ── */
+  .how-strip { padding: 0 0.55in 0.22in; }
+
+  .how-label { font-size: 6.5pt; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 0.1in; text-align: center; }
+
+  .how-steps { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; position: relative; }
+
+  .how-steps::before {
+    content: '';
+    position: absolute;
+    top: 0.14in; left: 10%; right: 10%;
+    height: 0.5pt;
+    background: var(--rule);
+    z-index: 0;
+  }
+
+  .how-step { text-align: center; position: relative; z-index: 1; padding: 0 0.05in; }
+
+  .how-num {
+    width: 0.28in; height: 0.28in;
+    border-radius: 50%;
+    background: var(--navy);
+    color: var(--white);
+    font-size: 8pt; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 0.06in;
+  }
+
+  .how-step-title { font-size: 7.5pt; font-weight: 600; color: var(--navy); margin-bottom: 2px; }
+  .how-step-desc { font-size: 6.5pt; color: var(--muted); line-height: 1.4; font-weight: 300; }
+
+  /* ── FOOTER ── */
+  .footer {
+    background: var(--offwhite);
+    border-top: 1pt solid var(--rule);
+    padding: 0.11in 0.55in;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-left { font-size: 7pt; color: var(--muted); font-weight: 300; line-height: 1.5; }
+  .footer-left strong { color: var(--navy); font-weight: 600; }
+
+  .footer-badge { display: flex; align-items: center; gap: 0.1in; }
+  .footer-badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
+  .footer-badge-text { font-size: 7pt; color: var(--teal); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<!-- Print Toolbar (screen only) -->
+<div class="print-toolbar">
+  <div class="print-toolbar-label"><strong>Commercial One-Pager</strong> — Ready to print</div>
+  <button class="print-btn" onclick="window.print()">🖨 Print / Save as PDF</button>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="brand-block">
+      <div class="brand-tagline">Commercial Laundry Partner Program</div>
+      <div class="brand-name">WaveMAX Laundry</div>
+      <div class="brand-address" id="header-address">Loading...</div>
+    </div>
+    <div class="header-badge">
+      <span class="badge-stars" id="badge-stars">★ ★ ★ ★ ★</span>
+      <span class="badge-label" id="badge-label">Loading...</span>
+    </div>
+  </header>
+
+  <!-- HERO BAND -->
+  <div class="hero-band">
+    <div class="hero-headline" id="hero-headline">Your laundry handled. Reliably. Every time.</div>
+    <div class="hero-sub">Professional pickup &amp; drop-off service for businesses of every size — same-day and next-day turnaround available.</div>
+  </div>
+
+  <!-- BODY -->
+  <div class="body">
+
+    <!-- LEFT COLUMN -->
+    <div class="left">
+      <div class="section-label">About the Service</div>
+      <div class="section-title">A local laundry partner<br>your team can count on</div>
+      <p class="intro-text" id="intro-text">
+        WaveMAX Laundry is your area's highest-rated full-service laundromat — and we're ready to become your business's most reliable laundry partner. Whether you need weekly linen service, fresh staff uniforms, or bulk kitchen towel turnaround, we deliver <strong>consistent quality, flexible scheduling, and zero hassle</strong> — so your team can focus on what they do best.
+      </p>
+      <p class="intro-text">
+        We wash, dry, and fold everything <strong>completely separate from other clients' orders</strong>. Your items are handled with care from the moment they arrive to the moment they're ready for pickup.
+      </p>
+
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-card-title">Linens &amp; Towels</div>
+          <div class="service-card-desc">Bed sheets, bath towels, pool towels, tablecloths, napkins — washed to brand standard.</div>
+        </div>
+        <div class="service-card">
+          <div class="service-card-title">Staff Uniforms</div>
+          <div class="service-card-desc">Aprons, chef jackets, scrubs, lab coats, coveralls — professionally cleaned and folded.</div>
+        </div>
+        <div class="service-card">
+          <div class="service-card-title">Kitchen &amp; Bar</div>
+          <div class="service-card-desc">Bar mops, kitchen towels, oven mitts, chef whites — back to you clean and dry within 24 hours.</div>
+        </div>
+        <div class="service-card">
+          <div class="service-card-title">Specialty Items</div>
+          <div class="service-card-desc">Comforters, blankets, gym gear, salon capes — our high-capacity machines handle it all.</div>
+        </div>
+      </div>
+
+      <div class="why-title">Why Businesses Choose WaveMAX</div>
+      <ul class="why-list" id="why-list">
+        <li>Same-day &amp; next-day turnaround</li>
+        <li>Scheduled weekly pickup available</li>
+        <li>Full-time attendant, always on site</li>
+        <li>High-efficiency Electrolux equipment</li>
+        <li>Each order washed completely separately</li>
+        <li>Eco-friendly, water-efficient machines</li>
+        <li>Whites returned white. Colors stay bright.</li>
+        <li>Flexible volume — no minimum required</li>
+      </ul>
+
+      <div class="testimonial" id="testimonial-block">
+        <div class="testimonial-text" id="testimonial-text">Their customer service is exceptional — you don't find this level of care at many places.</div>
+        <div class="testimonial-attr" id="testimonial-attr">— Verified Google Review · 5 stars</div>
+      </div>
+
+      <hr class="rule">
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="right">
+
+      <div class="pricing-box">
+        <div class="pricing-header">
+          <span class="pricing-header-title">Commercial Pricing</span>
+          <span class="pricing-header-tag">Volume Discounts Available</span>
+        </div>
+        <div class="pricing-row">
+          <div class="pricing-item">Wash, Dry &amp; Fold<span>Per pound · soap &amp; dryer sheets included</span></div>
+          <div class="pricing-value">Ask us</div>
+        </div>
+        <div class="pricing-row alt">
+          <div class="pricing-item">Oversized Items<span>Comforters, blankets, large tablecloths</span></div>
+          <div class="pricing-value">Flat rate</div>
+        </div>
+        <div class="pricing-row">
+          <div class="pricing-item">Weekly Account Rate<span>Scheduled recurring pickup &amp; delivery</span></div>
+          <div class="pricing-value">Negotiated</div>
+        </div>
+        <div class="pricing-row alt">
+          <div class="pricing-item">Rush / Same-Day<span>Drop off by noon, ready by 6pm</span></div>
+          <div class="pricing-value">Available</div>
+        </div>
+        <div class="pricing-row">
+          <div class="pricing-item">Custom Account Setup<span>Invoicing, pickup schedule, special instructions</span></div>
+          <div class="pricing-value">Let's talk</div>
+        </div>
+      </div>
+
+      <div class="serve-box">
+        <div class="serve-title">We Work With</div>
+        <div class="serve-grid" id="serve-grid">
+          <div class="serve-item">Hotels &amp; Motels</div>
+          <div class="serve-item">Restaurants &amp; Bars</div>
+          <div class="serve-item">Medical &amp; Dental Offices</div>
+          <div class="serve-item">Hair &amp; Nail Salons</div>
+          <div class="serve-item">Gyms &amp; Fitness Studios</div>
+          <div class="serve-item">Auto Repair Shops</div>
+          <div class="serve-item">Daycares &amp; Schools</div>
+          <div class="serve-item">Airbnb &amp; Short-Term Rentals</div>
+        </div>
+      </div>
+
+      <div class="offer-box">
+        <div class="offer-eyebrow">New Business Offer</div>
+        <div class="offer-headline" id="offer-headline">20% Off Your First Order</div>
+        <div class="offer-detail" id="offer-detail">Mention this flyer when you drop off your first commercial order. No commitment required — just bring your laundry and see the difference.</div>
+      </div>
+
+      <div class="contact-box">
+        <div class="contact-title">Get Started Today</div>
+        <div class="contact-row">
+          <span class="contact-icon">📞</span>
+          <span class="contact-label">Call / Text</span>
+          <span class="contact-value" id="contact-phone">(210) 314-3699</span>
+        </div>
+        <div class="contact-row">
+          <span class="contact-icon">📍</span>
+          <span class="contact-label">Address</span>
+          <span class="contact-value" id="contact-address">Loading...</span>
+        </div>
+        <div class="contact-row">
+          <span class="contact-icon">🕐</span>
+          <span class="contact-label">Hours</span>
+          <span class="contact-value">7:00 AM – 10:00 PM · Every Day</span>
+        </div>
+        <div class="contact-row">
+          <span class="contact-icon">🌐</span>
+          <span class="contact-label">Web</span>
+          <span class="contact-value" id="contact-web">wavemaxlaundry.com</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- HOW IT WORKS -->
+  <div class="how-strip">
+    <div class="how-label">How It Works — Getting Started Is Easy</div>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="how-num">1</div>
+        <div class="how-step-title">Call or Stop In</div>
+        <div class="how-step-desc">Reach out to discuss your needs. We'll set up your account in minutes.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">2</div>
+        <div class="how-step-title">Drop Off Your Order</div>
+        <div class="how-step-desc">Bring your laundry in a bag or bin. We'll weigh, sort, and tag it.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">3</div>
+        <div class="how-step-title">We Handle Everything</div>
+        <div class="how-step-desc">Washed, dried, folded, and hung — with any special instructions honored.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">4</div>
+        <div class="how-step-title">Pick Up &amp; Go</div>
+        <div class="how-step-desc">Ready same day or next day. No waiting around — in and out in minutes.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-num">5</div>
+        <div class="how-step-title">Set a Schedule</div>
+        <div class="how-step-desc">Recurring accounts get a standing schedule, volume pricing, and a dedicated contact.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-left">
+      <strong id="footer-name">WaveMAX Laundry</strong> · <span id="footer-address">Loading...</span><br>
+      Locally owned &amp; operated · Full-time attended facility · High-efficiency equipment · Eco-friendly wash systems
+    </div>
+    <div class="footer-badge">
+      <div class="footer-badge-dot"></div>
+      <div class="footer-badge-text" id="footer-badge-text">Your Local WaveMAX Partner</div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  (function() {
+    try {
+      var reportRaw = localStorage.getItem('fiq_report');
+      var formRaw = localStorage.getItem('fiq_form_data');
+      if (!reportRaw || !formRaw) return;
+
+      var report = JSON.parse(reportRaw);
+      var form = JSON.parse(formRaw);
+
+      var store = report.businessProfile || {};
+      var commercial = report.commercialTargets || {};
+      var collateral = report.collateral || {};
+      var onePager = collateral.onePager || {};
+      var address = form.address || '';
+
+      // Header
+      document.getElementById('header-address').textContent = address + ' · Open 7am–10pm Daily';
+      document.getElementById('contact-address').textContent = address;
+      document.getElementById('footer-address').textContent = address;
+
+      // Rating badge
+      if (store.rating && store.reviewCount) {
+        var stars = '★ ★ ★ ★ ★';
+        document.getElementById('badge-stars').textContent = stars;
+        document.getElementById('badge-label').textContent = store.rating + ' Stars · ' + store.reviewCount + '+ Reviews';
+      }
+
+      // Hero headline from collateral
+      if (onePager.headline) {
+        document.getElementById('hero-headline').textContent = onePager.headline;
+      }
+
+      // Offer
+      if (onePager.callToAction) {
+        document.getElementById('offer-headline').textContent = onePager.callToAction;
+      }
+      if (onePager.subheadline) {
+        document.getElementById('offer-detail').textContent = onePager.subheadline;
+      }
+
+      // Why list — use bullet points from collateral if available
+      if (onePager.bulletPoints && onePager.bulletPoints.length > 0) {
+        var whyList = document.getElementById('why-list');
+        whyList.innerHTML = '';
+        // Merge with defaults to always have 8 items
+        var defaults = [
+          'Same-day & next-day turnaround',
+          'Scheduled weekly pickup available',
+          'Full-time attendant, always on site',
+          'High-efficiency Electrolux equipment',
+          'Each order washed completely separately',
+          'Eco-friendly, water-efficient machines',
+          'Whites returned white. Colors stay bright.',
+          'Flexible volume — no minimum required'
+        ];
+        var bullets = onePager.bulletPoints.concat(defaults).slice(0, 8);
+        bullets.forEach(function(b) {
+          var li = document.createElement('li');
+          li.textContent = b;
+          whyList.appendChild(li);
+        });
+      }
+
+      // Testimonial — pull best review from store
+      if (store.reviewThemes && store.reviewThemes.length > 0) {
+        var bestTheme = store.reviewThemes.find(function(t) { return t.sampleQuote && t.sampleQuote.length > 20; });
+        if (bestTheme) {
+          document.getElementById('testimonial-text').textContent = bestTheme.sampleQuote;
+          document.getElementById('testimonial-attr').textContent = '— Verified Google Review · ' + (store.rating || '5') + ' stars';
+        }
+      }
+
+      // Commercial targets — populate serve grid with actual target categories
+      if (commercial.targets && commercial.targets.length > 0) {
+        var cats = [];
+        commercial.targets.forEach(function(t) {
+          if (t.category && cats.indexOf(t.category) === -1) cats.push(t.category);
+        });
+        if (cats.length >= 4) {
+          var serveGrid = document.getElementById('serve-grid');
+          serveGrid.innerHTML = '';
+          // Always include core categories + detected ones
+          var allCats = ['Hotels & Motels', 'Restaurants & Bars', 'Medical & Dental Offices', 'Hair & Nail Salons', 'Gyms & Fitness Studios', 'Auto Repair Shops', 'Daycares & Schools', 'Airbnb & Short-Term Rentals'];
+          allCats.forEach(function(c) {
+            var div = document.createElement('div');
+            div.className = 'serve-item';
+            div.textContent = c;
+            serveGrid.appendChild(div);
+          });
+        }
+      }
+
+      // Phone from owner profile
+      if (report.ownerProfile && report.ownerProfile.phone) {
+        document.getElementById('contact-phone').textContent = report.ownerProfile.phone;
+      }
+
+      // Footer badge
+      if (address) {
+        var city = address.split(',')[1] ? address.split(',')[1].trim() : '';
+        if (city) document.getElementById('footer-badge-text').textContent = 'Serving ' + city + ' Since 2019';
+      }
+
+    } catch(e) {
+      console.warn('Could not load report data:', e);
+    }
+  })();
+</script>
+</body>
+</html>
