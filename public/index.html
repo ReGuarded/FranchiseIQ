@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- FranchiseIQ v1.4 -->
+<!-- FranchiseIQ v1.5 — token auth synced with report.html -->
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -34,433 +34,80 @@
     --shadow:     0 4px 20px rgba(13,33,56,0.09);
     --shadow-lg:  0 12px 48px rgba(13,33,56,0.14);
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Outfit', sans-serif;
-    background: var(--cream);
-    color: var(--text-1);
-    min-height: 100vh;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 70% 50% at 10% 0%, rgba(26,58,92,0.07) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 40% at 90% 100%, rgba(201,131,42,0.06) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
+  body { font-family: 'Outfit', sans-serif; background: var(--cream); color: var(--text-1); min-height: 100vh; }
+  body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 70% 50% at 10% 0%, rgba(26,58,92,0.07) 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 90% 100%, rgba(201,131,42,0.06) 0%, transparent 50%); pointer-events: none; z-index: 0; }
   .page { position: relative; z-index: 1; max-width: 760px; margin: 0 auto; padding: 36px 24px 80px; }
-
-  /* ── Header ── */
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 44px;
-    animation: fadeUp 0.5s ease both;
-  }
-
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 44px; animation: fadeUp 0.5s ease both; }
   .logo { display: flex; align-items: center; gap: 12px; }
-
-  .logo-mark {
-    width: 44px; height: 44px;
-    background: var(--navy);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-
+  .logo-mark { width: 44px; height: 44px; background: var(--navy); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .logo-mark svg { width: 24px; height: 24px; }
-
   .logo-text { display: flex; flex-direction: column; line-height: 1; }
-
-  .logo-wordmark {
-    font-family: 'DM Serif Display', serif;
-    font-size: 22px;
-    color: var(--navy-deep);
-    letter-spacing: -0.3px;
-  }
-
+  .logo-wordmark { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--navy-deep); letter-spacing: -0.3px; }
   .logo-wordmark span { color: var(--gold); }
-
-  .logo-tagline {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    color: var(--text-3);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-top: 4px;
-  }
-
-  .header-badge {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    background: var(--gold-pale);
-    color: var(--gold);
-    border: 1px solid rgba(201,131,42,0.2);
-    padding: 5px 12px;
-    border-radius: 999px;
-  }
-
-  /* ── Hero ── */
-  .hero {
-    text-align: center;
-    padding: 20px 0 36px;
-    animation: fadeUp 0.5s 0.1s ease both;
-  }
-
-  .hero-eyebrow {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 16px;
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-  }
-
-  .hero-eyebrow::before, .hero-eyebrow::after {
-    content: '';
-    display: inline-block;
-    width: 32px; height: 1px;
-    background: var(--gold);
-    opacity: 0.5;
-  }
-
-  .hero h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: clamp(2rem, 5vw, 3.2rem);
-    line-height: 1.1;
-    color: var(--text-1);
-    margin-bottom: 16px;
-    letter-spacing: -0.5px;
-  }
-
+  .logo-tagline { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text-3); letter-spacing: 0.12em; text-transform: uppercase; margin-top: 4px; }
+  .header-badge { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; background: var(--gold-pale); color: var(--gold); border: 1px solid rgba(201,131,42,0.2); padding: 5px 12px; border-radius: 999px; }
+  .hero { text-align: center; padding: 20px 0 36px; animation: fadeUp 0.5s 0.1s ease both; }
+  .hero-eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--gold); margin-bottom: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .hero-eyebrow::before, .hero-eyebrow::after { content: ''; display: inline-block; width: 32px; height: 1px; background: var(--gold); opacity: 0.5; }
+  .hero h1 { font-family: 'DM Serif Display', serif; font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.1; color: var(--text-1); margin-bottom: 16px; letter-spacing: -0.5px; }
   .hero h1 em { font-style: italic; color: var(--navy); }
-
-  .hero-sub {
-    font-size: 1.05rem;
-    font-weight: 300;
-    color: var(--text-2);
-    line-height: 1.65;
-    max-width: 500px;
-    margin: 0 auto 24px;
-  }
-
+  .hero-sub { font-size: 1.05rem; font-weight: 300; color: var(--text-2); line-height: 1.65; max-width: 500px; margin: 0 auto 24px; }
   .proof-row { display: flex; align-items: center; justify-content: center; gap: 20px; flex-wrap: wrap; }
-
-  .proof-item {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 0.06em;
-    color: var(--text-3);
-    display: flex; align-items: center; gap: 6px;
-  }
-
-  .proof-item::before {
-    content: '';
-    display: inline-block;
-    width: 6px; height: 6px;
-    background: var(--success);
-    border-radius: 50%;
-  }
-
-  /* ── Form card ── */
-  .form-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-lg);
-    overflow: hidden;
-    animation: fadeUp 0.5s 0.2s ease both;
-    margin-bottom: 32px;
-  }
-
-  .form-card-header {
-    background: var(--navy);
-    padding: 24px 32px;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-
-  .form-card-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.25rem;
-    color: var(--white);
-  }
-
-  .form-card-title span {
-    display: block;
-    font-family: 'Outfit', sans-serif;
-    font-size: 12px;
-    font-weight: 300;
-    color: rgba(255,255,255,0.55);
-    margin-top: 3px;
-  }
-
+  .proof-item { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.06em; color: var(--text-3); display: flex; align-items: center; gap: 6px; }
+  .proof-item::before { content: ''; display: inline-block; width: 6px; height: 6px; background: var(--success); border-radius: 50%; }
+  .form-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-lg); overflow: hidden; animation: fadeUp 0.5s 0.2s ease both; margin-bottom: 32px; }
+  .form-card-header { background: var(--navy); padding: 24px 32px; display: flex; align-items: center; justify-content: space-between; }
+  .form-card-title { font-family: 'DM Serif Display', serif; font-size: 1.25rem; color: var(--white); }
+  .form-card-title span { display: block; font-family: 'Outfit', sans-serif; font-size: 12px; font-weight: 300; color: rgba(255,255,255,0.55); margin-top: 3px; }
   .form-body { padding: 28px 32px 32px; }
-
-  .section-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--navy-light);
-    margin-bottom: 16px;
-    margin-top: 28px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--border);
-  }
-
+  .section-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--navy-light); margin-bottom: 16px; margin-top: 28px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
   .section-label:first-child { margin-top: 0; }
-
   .field { margin-bottom: 18px; }
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-
-  label {
-    display: block;
-    font-size: 12.5px;
-    font-weight: 500;
-    color: var(--text-2);
-    margin-bottom: 7px;
-    letter-spacing: 0.02em;
-  }
-
+  label { display: block; font-size: 12.5px; font-weight: 500; color: var(--text-2); margin-bottom: 7px; letter-spacing: 0.02em; }
   label .opt { font-weight: 300; color: var(--text-3); font-size: 11px; }
-
-  input[type="text"], input[type="number"], select {
-    width: 100%;
-    padding: 11px 14px;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-family: 'Outfit', sans-serif;
-    font-size: 14px;
-    color: var(--text-1);
-    background: var(--cream);
-    transition: border-color 0.18s, box-shadow 0.18s;
-    outline: none;
-    appearance: none;
-    -webkit-appearance: none;
-  }
-
-  input:focus, select:focus {
-    border-color: var(--navy-light);
-    box-shadow: 0 0 0 3px rgba(26,58,92,0.1);
-    background: var(--white);
-  }
-
-  select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a8a9c' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 14px center;
-    cursor: pointer;
-    padding-right: 36px;
-  }
-
+  input[type="text"], input[type="number"], select { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'Outfit', sans-serif; font-size: 14px; color: var(--text-1); background: var(--cream); transition: border-color 0.18s, box-shadow 0.18s; outline: none; appearance: none; -webkit-appearance: none; }
+  input:focus, select:focus { border-color: var(--navy-light); box-shadow: 0 0 0 3px rgba(26,58,92,0.1); background: var(--white); }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='7' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a8a9c' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; cursor: pointer; padding-right: 36px; }
   .chip-group { display: flex; flex-wrap: wrap; gap: 8px; }
-
-  .chip {
-    padding: 7px 14px;
-    border-radius: 999px;
-    border: 1.5px solid var(--border);
-    font-size: 13px;
-    font-weight: 400;
-    color: var(--text-2);
-    background: var(--cream);
-    cursor: pointer;
-    transition: all 0.16s;
-    user-select: none;
-  }
-
+  .chip { padding: 7px 14px; border-radius: 999px; border: 1.5px solid var(--border); font-size: 13px; font-weight: 400; color: var(--text-2); background: var(--cream); cursor: pointer; transition: all 0.16s; user-select: none; }
   .chip:hover { border-color: var(--navy-light); color: var(--navy); }
-
-  .chip.selected {
-    background: var(--navy-pale);
-    border-color: var(--navy);
-    color: var(--navy);
-    font-weight: 500;
-  }
-
+  .chip.selected { background: var(--navy-pale); border-color: var(--navy); color: var(--navy); font-weight: 500; }
   .divider { height: 1px; background: var(--border); margin: 28px 0; }
-
   .cta-wrap { margin-top: 4px; }
-
-  .cta-btn {
-    width: 100%;
-    padding: 16px 24px;
-    background: var(--navy);
-    color: var(--white);
-    border: none;
-    border-radius: var(--radius-sm);
-    font-family: 'Outfit', sans-serif;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.16s, transform 0.1s;
-    display: flex; align-items: center; justify-content: center; gap: 10px;
-    letter-spacing: 0.01em;
-  }
-
+  .cta-btn { width: 100%; padding: 16px 24px; background: var(--navy); color: var(--white); border: none; border-radius: var(--radius-sm); font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 500; cursor: pointer; transition: background 0.16s, transform 0.1s; display: flex; align-items: center; justify-content: center; gap: 10px; letter-spacing: 0.01em; }
   .cta-btn:hover { background: var(--navy-deep); }
   .cta-btn:active { transform: scale(0.99); }
   .cta-btn:disabled { background: var(--text-3); cursor: not-allowed; transform: none; }
-
-  .cta-sub {
-    text-align: center;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--text-3);
-    margin-top: 10px;
-    letter-spacing: 0.04em;
-  }
-
-  .deliverables-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    animation: fadeUp 0.5s 0.3s ease both;
-  }
-
-  .deliverable {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 16px 18px;
-    display: flex; align-items: flex-start; gap: 12px;
-  }
-
-  .del-icon {
-    width: 32px; height: 32px;
-    border-radius: 8px;
-    background: var(--navy-pale);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 15px;
-    flex-shrink: 0;
-  }
-
+  .cta-sub { text-align: center; font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text-3); margin-top: 10px; letter-spacing: 0.04em; }
+  .deliverables-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; animation: fadeUp 0.5s 0.3s ease both; }
+  .deliverable { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 16px 18px; display: flex; align-items: flex-start; gap: 12px; }
+  .del-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--navy-pale); display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
   .del-title { font-size: 13px; font-weight: 500; color: var(--text-1); margin-bottom: 3px; }
   .del-desc { font-size: 11.5px; color: var(--text-3); line-height: 1.45; }
-
-  .section-header {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--text-3);
-    margin-bottom: 14px;
-    text-align: center;
-  }
-
+  .section-header { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); margin-bottom: 14px; text-align: center; }
   /* ── Password Gate ── */
-  #password-gate {
-    position: fixed;
-    inset: 0;
-    background: var(--cream);
-    z-index: 1000;
-    display: flex; align-items: center; justify-content: center;
-    padding: 24px;
-  }
-
-  #password-gate::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 70% 50% at 10% 0%, rgba(26,58,92,0.07) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 40% at 90% 100%, rgba(201,131,42,0.06) 0%, transparent 50%);
-    pointer-events: none;
-  }
-
-  .gate-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-lg);
-    padding: 40px 36px;
-    width: 100%;
-    max-width: 420px;
-    text-align: center;
-    position: relative;
-    z-index: 1;
-    animation: fadeUp 0.4s ease both;
-  }
-
+  #password-gate { position: fixed; inset: 0; background: var(--cream); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  #password-gate::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 70% 50% at 10% 0%, rgba(26,58,92,0.07) 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 90% 100%, rgba(201,131,42,0.06) 0%, transparent 50%); pointer-events: none; }
+  .gate-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow-lg); padding: 40px 36px; width: 100%; max-width: 420px; text-align: center; position: relative; z-index: 1; animation: fadeUp 0.4s ease both; }
   .gate-logo { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 28px; }
-
-  .gate-logo-mark {
-    width: 44px; height: 44px;
-    background: var(--navy);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-  }
-
+  .gate-logo-mark { width: 44px; height: 44px; background: var(--navy); border-radius: 10px; display: flex; align-items: center; justify-content: center; }
   .gate-logo-mark svg { width: 24px; height: 24px; }
-
   .gate-wordmark { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--navy-deep); }
   .gate-wordmark span { color: var(--gold); }
-
   .gate-title { font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: var(--navy-deep); margin-bottom: 8px; }
-
   .gate-sub { font-size: 13px; font-weight: 300; color: var(--text-3); margin-bottom: 28px; line-height: 1.5; }
-
   .gate-input-wrap { position: relative; margin-bottom: 14px; }
-
-  .gate-input {
-    width: 100%;
-    padding: 13px 16px;
-    border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
-    font-family: 'Outfit', sans-serif;
-    font-size: 15px;
-    color: var(--text-1);
-    background: var(--cream);
-    outline: none;
-    text-align: center;
-    letter-spacing: 0.08em;
-    transition: border-color 0.18s, box-shadow 0.18s;
-  }
-
-  .gate-input:focus {
-    border-color: var(--navy-light);
-    box-shadow: 0 0 0 3px rgba(26,58,92,0.1);
-    background: var(--white);
-  }
-
+  .gate-input { width: 100%; padding: 13px 16px; border: 1.5px solid var(--border); border-radius: var(--radius-sm); font-family: 'Outfit', sans-serif; font-size: 15px; color: var(--text-1); background: var(--cream); outline: none; text-align: center; letter-spacing: 0.08em; transition: border-color 0.18s, box-shadow 0.18s; }
+  .gate-input:focus { border-color: var(--navy-light); box-shadow: 0 0 0 3px rgba(26,58,92,0.1); background: var(--white); }
   .gate-input.error { border-color: #c0392b; box-shadow: 0 0 0 3px rgba(192,57,43,0.1); }
-
-  .gate-btn {
-    width: 100%;
-    padding: 14px 24px;
-    background: var(--navy);
-    color: var(--white);
-    border: none;
-    border-radius: var(--radius-sm);
-    font-family: 'Outfit', sans-serif;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.16s;
-    letter-spacing: 0.01em;
-  }
-
+  .gate-btn { width: 100%; padding: 14px 24px; background: var(--navy); color: var(--white); border: none; border-radius: var(--radius-sm); font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 500; cursor: pointer; transition: background 0.16s; letter-spacing: 0.01em; }
   .gate-btn:hover { background: var(--navy-deep); }
   .gate-btn:disabled { background: var(--text-3); cursor: not-allowed; }
-
   .gate-error { font-size: 12px; color: #c0392b; margin-top: 10px; display: none; font-family: 'DM Mono', monospace; letter-spacing: 0.04em; }
   .gate-badge { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3); margin-top: 20px; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
   @media (max-width: 560px) {
     .form-body { padding: 20px; }
     .form-card-header { padding: 18px 20px; flex-direction: column; align-items: flex-start; gap: 10px; }
@@ -533,9 +180,7 @@
     </div>
 
     <div class="form-body">
-
       <div class="section-label">Your Location</div>
-
       <div class="field">
         <label>Franchise brand</label>
         <select id="brand">
@@ -543,13 +188,10 @@
           <option value="trublue" disabled>TruBlue Home Services (coming soon)</option>
         </select>
       </div>
-
       <div class="field">
         <label>Your franchise address</label>
-        <input type="text" id="address" placeholder="e.g. 2525 Jackson Keller Rd, San Antonio, TX 78230"
-          value="2525 Jackson Keller Rd, San Antonio, TX 78230"/>
+        <input type="text" id="address" placeholder="e.g. 2525 Jackson Keller Rd, San Antonio, TX 78230" value="2525 Jackson Keller Rd, San Antonio, TX 78230"/>
       </div>
-
       <div class="field-row">
         <div class="field">
           <label>Number of washers</label>
@@ -560,7 +202,6 @@
           <input type="number" id="dryers" placeholder="e.g. 24" min="1" value=""/>
         </div>
       </div>
-
       <div class="field">
         <label>Approximate monthly revenue <span class="opt">(optional — helps calibrate targets)</span></label>
         <select id="revenue">
@@ -572,7 +213,6 @@
           <option value="over60k">Over $60,000</option>
         </select>
       </div>
-
       <div class="field">
         <label>Monthly marketing budget <span class="opt">(helps calibrate recommendations)</span></label>
         <select id="budget">
@@ -584,9 +224,7 @@
           <option value="over1000">Over $1,000/month</option>
         </select>
       </div>
-
       <div class="section-label">Your Growth Profile</div>
-
       <div class="field">
         <label>Biggest growth challenges <span class="opt">(select all that apply)</span></label>
         <div class="chip-group" id="challenges">
@@ -598,7 +236,6 @@
           <div class="chip" onclick="toggleChip(this,'challenges')">Weekday traffic</div>
         </div>
       </div>
-
       <div class="field">
         <label>How do you currently market? <span class="opt">(select all that apply)</span></label>
         <div class="chip-group" id="marketing">
@@ -610,16 +247,13 @@
           <div class="chip" onclick="toggleChip(this,'marketing')">Nothing formal yet</div>
         </div>
       </div>
-
       <div class="divider"></div>
-
       <div class="cta-wrap">
         <button class="cta-btn" id="submit-btn" onclick="handleSubmit()">
           Generate my Market Growth Strategy &nbsp;→
         </button>
         <div class="cta-sub">Beta access · Full report delivered on next page</div>
       </div>
-
     </div>
   </div>
 
@@ -627,31 +261,19 @@
   <div class="deliverables-grid">
     <div class="deliverable">
       <div class="del-icon">📊</div>
-      <div>
-        <div class="del-title">Market Research Brief</div>
-        <div class="del-desc">Demographics, competitor landscape, apartment ecosystem & reputation audit</div>
-      </div>
+      <div><div class="del-title">Market Research Brief</div><div class="del-desc">Demographics, competitor landscape, apartment ecosystem & reputation audit</div></div>
     </div>
     <div class="deliverable">
       <div class="del-icon">📋</div>
-      <div>
-        <div class="del-title">Marketing Action Plan</div>
-        <div class="del-desc">Prioritized tactics, budget allocation & 90-day checklist</div>
-      </div>
+      <div><div class="del-title">Marketing Action Plan</div><div class="del-desc">Prioritized tactics, budget allocation & 90-day checklist</div></div>
     </div>
     <div class="deliverable">
       <div class="del-icon">🎯</div>
-      <div>
-        <div class="del-title">Commercial Target List</div>
-        <div class="del-desc">Nearby businesses by category with revenue projections & pitch strategy</div>
-      </div>
+      <div><div class="del-title">Commercial Target List</div><div class="del-desc">Nearby businesses by category with revenue projections & pitch strategy</div></div>
     </div>
     <div class="deliverable">
       <div class="del-icon">📄</div>
-      <div>
-        <div class="del-title">Print-Ready Collateral</div>
-        <div class="del-desc">Commercial one-pager & apartment door hanger, ready to print</div>
-      </div>
+      <div><div class="del-title">Print-Ready Collateral</div><div class="del-desc">Commercial one-pager & apartment door hanger, ready to print</div></div>
     </div>
   </div>
 
@@ -680,9 +302,12 @@
       });
       var data = await res.json();
 
-      if (data.success) {
-        // Store password in sessionStorage — sent with every API call
-        try { sessionStorage.setItem('fiq_pw', password); } catch(e) {}
+      if (data.success && data.token) {
+        // ── Save token to localStorage so report.html can read it ──
+        try {
+          localStorage.setItem('fiq_token', data.token);
+          localStorage.setItem('fiq_role', data.role || 'guest');
+        } catch(e) {}
         document.getElementById('password-gate').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
       } else {
@@ -713,11 +338,11 @@
     }
   });
 
-  // Check if already authenticated this session
+  // Check if already authenticated (token still valid in localStorage)
   (function() {
     try {
-      var pw = sessionStorage.getItem('fiq_pw');
-      if (pw) {
+      var token = localStorage.getItem('fiq_token');
+      if (token) {
         document.getElementById('password-gate').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
       }
