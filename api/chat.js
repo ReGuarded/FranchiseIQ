@@ -1,4 +1,4 @@
-// FranchiseIQ v1.6 — stateless token auth + 529 retry
+// FranchiseIQ v1.7 — colleges/universities added to research pipeline
 module.exports = async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -12,12 +12,9 @@ module.exports = async function handler(req, res) {
     'fiq-guest-2026':  'guest'
   };
 
-  // ── Token secret — used to sign and verify tokens without any shared memory ──
-  // Falls back to a hardcoded secret if env var not set (fine for beta)
+  // ── Token secret ──
   var TOKEN_SECRET = process.env.FIQ_TOKEN_SECRET || 'fiq-secret-beta-2026';
 
-  // ── Simple stateless token: base64(payload) + "." + base64(signature) ──
-  // No JWT library needed — just HMAC-SHA256 via Node's built-in crypto
   var crypto = require('crypto');
 
   function makeToken(role) {
@@ -33,13 +30,11 @@ module.exports = async function handler(req, res) {
     if (parts.length !== 2) return null;
     var b64payload = parts[0];
     var sig = parts[1];
-    // Verify signature
     var expectedSig = crypto.createHmac('sha256', TOKEN_SECRET).update(b64payload).digest('base64');
     if (sig !== expectedSig) return null;
-    // Decode and check expiry
     try {
       var payload = JSON.parse(Buffer.from(b64payload, 'base64').toString());
-      if (Date.now() > payload.exp) return null; // expired
+      if (Date.now() > payload.exp) return null;
       return payload;
     } catch(e) { return null; }
   }
@@ -84,7 +79,7 @@ module.exports = async function handler(req, res) {
       return res.status(200).json({ success: true, token: token, role: role });
     }
 
-    // ── TOKEN GUARD — verify on every research/synthesize call ──
+    // ── TOKEN GUARD ──
     if (type === 'research' || type === 'synthesize') {
       var payload = verifyToken(body.token);
       if (!payload) {
@@ -208,6 +203,20 @@ module.exports = async function handler(req, res) {
         } catch(e) { return []; }
       }
 
+      // ── Run all research in parallel ──
+      // Index map:
+      //  0  competitors
+      //  1  apartments
+      //  2  hotels
+      //  3  gyms
+      //  4  medical
+      //  5  restaurants
+      //  6  salons
+      //  7  automotive
+      //  8  daycares
+      //  9  demographics (Census)
+      // 10  ownerProfile
+      // 11  colleges/universities  ← NEW
       var results = await Promise.all([
         searchFull('laundromat coin laundry wash fold', 5000, 4, false),
         searchFull('apartment complex', 1500, 6, true),
@@ -219,22 +228,24 @@ module.exports = async function handler(req, res) {
         searchLight('auto repair mechanic shop', 3200, 4),
         searchLight('daycare childcare preschool', 3200, 4),
         getCensus(zipCode),
-        getOwnerProfile()
+        getOwnerProfile(),
+        searchLight('college university campus student housing', 4800, 4)  // ← NEW
       ]);
 
       var research = {
         address: formattedAddress, lat: lat, lng: lng, zipCode: zipCode,
         demographics: results[9],
-        ownerProfile: results[10],
-        competitors:  { results: results[0] },
-        apartments:   { results: results[1] },
-        hotels:       { results: results[2] },
-        gyms:         { results: results[3] },
-        medical:      { results: results[4] },
-        restaurants:  { results: results[5] },
-        salons:       { results: results[6] },
-        automotive:   { results: results[7] },
-        daycares:     { results: results[8] }
+        ownerProfile:  results[10],
+        competitors:   { results: results[0] },
+        apartments:    { results: results[1] },
+        hotels:        { results: results[2] },
+        gyms:          { results: results[3] },
+        medical:       { results: results[4] },
+        restaurants:   { results: results[5] },
+        salons:        { results: results[6] },
+        automotive:    { results: results[7] },
+        daycares:      { results: results[8] },
+        colleges:      { results: results[11] }   // ← NEW
       };
 
       return res.status(200).json({ success: true, research: research });
@@ -257,6 +268,8 @@ module.exports = async function handler(req, res) {
         'BUSINESS PROFILE & REPUTATION: Combine store stats and reputation into one rich section. Lead with rating and review count. Compare rating directly to named competitors. Mine the owner\'s own Google reviews for specific themes — cleanliness, staff names, machine quality. If staff are mentioned by name (e.g. Nora, Jessica), call them out specifically — named staff are a marketing moat. Identify one honest gap. Give 4 specific tactical actions.',
         '',
         'APARTMENT TARGETING: Prioritize complexes that are CLOSEST first. Low-rated complexes (under 3.5 stars) with laundry complaints are HIGHEST priority. Mine review text for broken machines, laundry, maintenance. List minimum 5 complexes.',
+        '',
+        'COLLEGES & UNIVERSITIES: If any colleges, universities, or campuses are present within the research radius, treat them as a dual opportunity — (1) residential: students in off-campus housing are high-frequency laundromat users with no in-unit machines; prioritize by proximity and estimated student population; (2) commercial: campus rec centers, athletics departments, and student housing managers are commercial wash-and-fold accounts. If no colleges are found, set collegeOpportunity to null.',
         '',
         'COMPETITOR ANALYSIS: Include minimum 5 competitors. Reference specific weaknesses from review text. Coin-only payment, dirty facilities, theft complaints are exploitable weaknesses.',
         '',
@@ -337,12 +350,24 @@ module.exports = async function handler(req, res) {
             topTargets: [
               { name: "exact name", address: "address", distanceLabel: "X.X miles away", priority: "High/Medium/Low", rating: 3.0, reviewCount: 197, laundryFrustration: "Specific complaint or proximity rationale", reason: "Why this complex is a priority" }
             ]
+          },
+          // ── COLLEGES — null if none found within radius ──
+          collegeOpportunity: {
+            present: true,
+            summary: "2-3 sentences on the student market opportunity — reference school names and distances",
+            estimatedStudentPopulation: "X,XXX students within radius",
+            residentialAngle: "Why off-campus students are high-frequency users — no in-unit machines, budget-conscious, routine launchers",
+            commercialAngle: "Specific commercial accounts to target: campus rec center, athletics department, student housing management office — with pitch angle for each",
+            topTargets: [
+              { name: "exact school or campus housing name", distanceLabel: "X.X miles away", type: "University/Community College/Campus Housing", studentPopulation: "X,XXX", priority: "High/Medium/Low", outreachAngle: "Specific approach — residential flyers vs commercial account pitch" }
+            ],
+            studentDiscountRecommendation: "Specific discount offer or loyalty program designed for students (e.g. 10% off with student ID, free dry with wash, loyalty punch card)"
           }
         },
         marketingActionPlan: {
           summary: "2-3 sentences referencing market conditions and stated budget",
           tactics: [
-            { rank: 1, title: "Tactic name", category: "Apartment Outreach / Commercial / Digital / In-Store", description: "3-4 sentences with specific names and steps", effort: "Low/Medium/High", impact: "Low/Medium/High", timeframe: "Week 1-2 / Month 1 / Ongoing", estimatedMonthlyRevenue: "$X,XXX-X,XXX" }
+            { rank: 1, title: "Tactic name", category: "Apartment Outreach / Commercial / Digital / In-Store / Student Outreach", description: "3-4 sentences with specific names and steps", effort: "Low/Medium/High", impact: "Low/Medium/High", timeframe: "Week 1-2 / Month 1 / Ongoing", estimatedMonthlyRevenue: "$X,XXX-X,XXX" }
           ],
           budgetAllocation: {
             total: "Must match stated budget",
@@ -397,6 +422,7 @@ module.exports = async function handler(req, res) {
         '', 'DEMOGRAPHICS:', demoText,
         '', 'COMPETITORS (sorted by distance — list minimum 5):', summarize('competitors'),
         '', 'APARTMENTS (sorted closest first — list minimum 5, prioritize low-rated with laundry complaints):', summarize('apartments'),
+        '', 'COLLEGES & UNIVERSITIES (sorted closest first — treat as dual residential + commercial opportunity; null section if none found):', summarize('colleges'),
         '', 'HOTELS:', summarize('hotels'),
         '', 'GYMS:', summarize('gyms'),
         '', 'MEDICAL & DENTAL:', summarize('medical'),

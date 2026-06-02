@@ -658,7 +658,7 @@
 </div>
 
 <script>
-  // ── Password Gate (server-side validation) ──
+  // ── Password Gate ──
   async function checkPassword() {
     var input = document.getElementById('gate-input');
     var errorEl = document.getElementById('gate-error');
@@ -680,8 +680,9 @@
       });
       var data = await res.json();
 
-      if (data.success && data.token) {
-        try { localStorage.setItem('fiq_token', data.token); } catch(e) {}
+      if (data.success) {
+        // Store password in sessionStorage — sent with every API call
+        try { sessionStorage.setItem('fiq_pw', password); } catch(e) {}
         document.getElementById('password-gate').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
       } else {
@@ -712,11 +713,11 @@
     }
   });
 
-  // Check if already authenticated (token in localStorage)
+  // Check if already authenticated this session
   (function() {
     try {
-      var token = localStorage.getItem('fiq_token');
-      if (token) {
+      var pw = sessionStorage.getItem('fiq_pw');
+      if (pw) {
         document.getElementById('password-gate').style.display = 'none';
         document.getElementById('main-content').style.display = 'block';
       }

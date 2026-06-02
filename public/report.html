@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- FranchiseIQ v1.2 — Report Page -->
+<!-- FranchiseIQ v1.3 — College/University section added -->
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
@@ -32,585 +32,133 @@
     --success-pale: #e1f5ee;
     --warning:    #c9832a;
     --danger:     #c0392b;
+    --college:    #4a2c7a;
+    --college-pale: #f0eaf8;
     --radius:     14px;
     --radius-sm:  9px;
     --shadow:     0 4px 20px rgba(13,33,56,0.09);
   }
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'Outfit', sans-serif;
-    background: var(--cream);
-    color: var(--text-1);
-    min-height: 100vh;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 70% 50% at 10% 0%, rgba(26,58,92,0.06) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 40% at 90% 100%, rgba(201,131,42,0.05) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
+  body { font-family: 'Outfit', sans-serif; background: var(--cream); color: var(--text-1); min-height: 100vh; }
+  body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 70% 50% at 10% 0%, rgba(26,58,92,0.06) 0%, transparent 60%), radial-gradient(ellipse 50% 40% at 90% 100%, rgba(201,131,42,0.05) 0%, transparent 50%); pointer-events: none; z-index: 0; }
   .page { position: relative; z-index: 1; max-width: 820px; margin: 0 auto; padding: 32px 24px 80px; }
-
-  /* ── Header ── */
-  header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 36px;
-  }
-
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 36px; }
   .logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
-
-  .logo-mark {
-    width: 40px; height: 40px;
-    background: var(--navy);
-    border-radius: 9px;
-    display: flex; align-items: center; justify-content: center;
-  }
-
+  .logo-mark { width: 40px; height: 40px; background: var(--navy); border-radius: 9px; display: flex; align-items: center; justify-content: center; }
   .logo-mark svg { width: 22px; height: 22px; }
-
-  .logo-wordmark {
-    font-family: 'DM Serif Display', serif;
-    font-size: 20px;
-    color: var(--navy-deep);
-  }
-
+  .logo-wordmark { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--navy-deep); }
   .logo-wordmark span { color: var(--gold); }
-
-  /* ── Loading state ── */
   #loading-state { animation: fadeUp 0.4s ease both; }
-
-  .loading-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    padding: 48px 40px;
-    text-align: center;
-  }
-
-  .loading-icon {
-    width: 64px; height: 64px;
-    background: var(--navy-pale);
-    border-radius: 16px;
-    margin: 0 auto 24px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 28px;
-  }
-
-  .loading-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.6rem;
-    color: var(--navy-deep);
-    margin-bottom: 10px;
-  }
-
-  .loading-sub {
-    font-size: 14px;
-    font-weight: 300;
-    color: var(--text-3);
-    margin-bottom: 36px;
-    line-height: 1.6;
-  }
-
+  .loading-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); padding: 48px 40px; text-align: center; }
+  .loading-icon { width: 64px; height: 64px; background: var(--navy-pale); border-radius: 16px; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+  .loading-title { font-family: 'DM Serif Display', serif; font-size: 1.6rem; color: var(--navy-deep); margin-bottom: 10px; }
+  .loading-sub { font-size: 14px; font-weight: 300; color: var(--text-3); margin-bottom: 36px; line-height: 1.6; }
   .loading-steps { max-width: 400px; margin: 0 auto; text-align: left; }
-
-  .loading-step {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 14px;
-    color: var(--text-2);
-    transition: color 0.3s;
-  }
-
+  .loading-step { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text-2); transition: color 0.3s; }
   .loading-step:last-child { border-bottom: none; }
-
-  .step-dot {
-    width: 24px; height: 24px;
-    border-radius: 50%;
-    background: var(--warm-gray);
-    border: 2px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-    transition: all 0.3s;
-    font-size: 11px;
-  }
-
-  .loading-step.active .step-dot {
-    background: var(--navy-pale);
-    border-color: var(--navy-light);
-    animation: pulse 1s ease infinite;
-  }
-
-  .loading-step.done .step-dot {
-    background: var(--success-pale);
-    border-color: var(--success);
-    color: var(--success);
-  }
-
+  .step-dot { width: 24px; height: 24px; border-radius: 50%; background: var(--warm-gray); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s; font-size: 11px; }
+  .loading-step.active .step-dot { background: var(--navy-pale); border-color: var(--navy-light); animation: pulse 1s ease infinite; }
+  .loading-step.done .step-dot { background: var(--success-pale); border-color: var(--success); color: var(--success); }
   .loading-step.done { color: var(--text-3); }
   .loading-step.active { color: var(--navy); font-weight: 500; }
-
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-  }
-
-  /* ── Error state ── */
+  @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
   #error-state { display: none; }
-  .error-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    border: 1px solid #f5c6cb;
-    padding: 32px;
-    text-align: center;
-  }
+  .error-card { background: var(--white); border-radius: var(--radius); border: 1px solid #f5c6cb; padding: 32px; text-align: center; }
   .error-card h2 { color: var(--danger); margin-bottom: 10px; }
   .error-card p { color: var(--text-2); font-size: 14px; margin-bottom: 20px; }
-  .back-btn {
-    display: inline-block;
-    padding: 10px 24px;
-    background: var(--navy);
-    color: white;
-    border-radius: var(--radius-sm);
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-  }
-
-  /* ── Report state ── */
+  .back-btn { display: inline-block; padding: 10px 24px; background: var(--navy); color: white; border-radius: var(--radius-sm); text-decoration: none; font-size: 14px; font-weight: 500; }
   #report-state { display: none; }
-
-  /* Report header */
-  .report-header {
-    background: var(--navy);
-    border-radius: var(--radius);
-    padding: 32px 36px;
-    margin-bottom: 24px;
-    color: var(--white);
-  }
-
-  .report-header-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 20px;
-  }
-
-  .report-eyebrow {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.5);
-    margin-bottom: 8px;
-  }
-
-  .report-headline {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.5rem;
-    color: var(--white);
-    line-height: 1.2;
-    max-width: 480px;
-  }
-
-  .opportunity-badge {
-    background: rgba(201,131,42,0.2);
-    border: 1px solid rgba(201,131,42,0.4);
-    border-radius: 999px;
-    padding: 8px 16px;
-    text-align: center;
-    flex-shrink: 0;
-  }
-
-  .opportunity-badge .score {
-    font-family: 'DM Serif Display', serif;
-    font-size: 2rem;
-    color: var(--gold-light);
-    line-height: 1;
-  }
-
-  .opportunity-badge .score-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 9px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.5);
-    margin-top: 3px;
-  }
-
-  .report-overview {
-    font-size: 14px;
-    font-weight: 300;
-    color: rgba(255,255,255,0.75);
-    line-height: 1.65;
-    border-top: 1px solid rgba(255,255,255,0.12);
-    padding-top: 16px;
-  }
-
-  .top-opportunity {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(201,131,42,0.15);
-    border-radius: 8px;
-    padding: 10px 14px;
-    margin-top: 14px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--gold-light);
-  }
-
-  /* Section cards */
-  .section-card {
-    background: var(--white);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow);
-    margin-bottom: 20px;
-    overflow: hidden;
-  }
-
-  .section-card-header {
-    padding: 18px 28px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .section-icon {
-    width: 36px; height: 36px;
-    border-radius: 9px;
-    background: var(--navy-pale);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 17px;
-    flex-shrink: 0;
-  }
-
-  .section-title {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.1rem;
-    color: var(--navy-deep);
-  }
-
-  .section-subtitle {
-    font-size: 12px;
-    font-weight: 300;
-    color: var(--text-3);
-  }
-
+  .report-header { background: var(--navy); border-radius: var(--radius); padding: 32px 36px; margin-bottom: 24px; color: var(--white); }
+  .report-header-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+  .report-eyebrow { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+  .report-headline { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--white); line-height: 1.2; max-width: 480px; }
+  .opportunity-badge { background: rgba(201,131,42,0.2); border: 1px solid rgba(201,131,42,0.4); border-radius: 999px; padding: 8px 16px; text-align: center; flex-shrink: 0; }
+  .opportunity-badge .score { font-family: 'DM Serif Display', serif; font-size: 2rem; color: var(--gold-light); line-height: 1; }
+  .opportunity-badge .score-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.5); margin-top: 3px; }
+  .report-overview { font-size: 14px; font-weight: 300; color: rgba(255,255,255,0.75); line-height: 1.65; border-top: 1px solid rgba(255,255,255,0.12); padding-top: 16px; }
+  .top-opportunity { display: inline-flex; align-items: center; gap: 8px; background: rgba(201,131,42,0.15); border-radius: 8px; padding: 10px 14px; margin-top: 14px; font-size: 13px; font-weight: 500; color: var(--gold-light); }
+  .section-card { background: var(--white); border-radius: var(--radius); border: 1px solid var(--border); box-shadow: var(--shadow); margin-bottom: 20px; overflow: hidden; }
+  .section-card-header { padding: 18px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+  .section-icon { width: 36px; height: 36px; border-radius: 9px; background: var(--navy-pale); display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
+  .section-icon.college-icon { background: var(--college-pale); }
+  .section-title { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: var(--navy-deep); }
+  .section-subtitle { font-size: 12px; font-weight: 300; color: var(--text-3); }
   .section-body { padding: 24px 28px; }
-
-  .summary-text {
-    font-size: 14px;
-    font-weight: 300;
-    color: var(--text-2);
-    line-height: 1.7;
-    margin-bottom: 20px;
-  }
-
-  .sub-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-3);
-    margin-bottom: 12px;
-    margin-top: 20px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border);
-  }
-
+  .summary-text { font-size: 14px; font-weight: 300; color: var(--text-2); line-height: 1.7; margin-bottom: 20px; }
+  .sub-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); margin-bottom: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
   .sub-label:first-child { margin-top: 0; border-top: none; padding-top: 0; }
-
-  /* Competitor cards */
   .competitor-list { display: flex; flex-direction: column; gap: 10px; }
-
-  .competitor-card {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    padding: 14px 16px;
-    background: var(--cream);
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-  }
-
-  .comp-rank {
-    width: 28px; height: 28px;
-    border-radius: 50%;
-    background: var(--navy-pale);
-    color: var(--navy);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    font-weight: 500;
-    flex-shrink: 0;
-  }
-
+  .competitor-card { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; background: var(--cream); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+  .comp-rank { width: 28px; height: 28px; border-radius: 50%; background: var(--navy-pale); color: var(--navy); display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; flex-shrink: 0; }
   .comp-name { font-size: 14px; font-weight: 500; color: var(--text-1); margin-bottom: 2px; }
   .comp-address { font-size: 12px; color: var(--text-3); margin-bottom: 6px; }
   .comp-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-
   .comp-rating { font-size: 12px; color: var(--gold); font-family: 'DM Mono', monospace; }
-
-  .threat-badge {
-    font-size: 11px;
-    font-family: 'DM Mono', monospace;
-    padding: 2px 9px;
-    border-radius: 999px;
-    font-weight: 500;
-  }
-
+  .threat-badge { font-size: 11px; font-family: 'DM Mono', monospace; padding: 2px 9px; border-radius: 999px; font-weight: 500; }
   .threat-high { background: #fde8e8; color: var(--danger); }
   .threat-medium { background: var(--gold-pale); color: var(--gold); }
   .threat-low { background: var(--success-pale); color: var(--success); }
-
   .comp-weakness { font-size: 12px; color: var(--text-2); margin-top: 5px; font-style: italic; }
-
-  /* Apartment targets */
-  .apt-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 16px;
-  }
-
-  .stat-box {
-    background: var(--navy-pale);
-    border-radius: var(--radius-sm);
-    padding: 14px;
-    text-align: center;
-  }
-
-  .stat-value {
-    font-family: 'DM Serif Display', serif;
-    font-size: 1.4rem;
-    color: var(--navy);
-    line-height: 1;
-    margin-bottom: 4px;
-  }
-
-  .stat-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--navy-light);
-  }
-
+  .apt-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  .stat-box { background: var(--navy-pale); border-radius: var(--radius-sm); padding: 14px; text-align: center; }
+  .stat-value { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--navy); line-height: 1; margin-bottom: 4px; }
+  .stat-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--navy-light); }
   .target-list { display: flex; flex-direction: column; gap: 8px; }
-
-  .target-item {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    padding: 12px 14px;
-    background: var(--cream);
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-    gap: 12px;
-  }
-
+  .target-item { display: flex; align-items: flex-start; justify-content: space-between; padding: 12px 14px; background: var(--cream); border-radius: var(--radius-sm); border: 1px solid var(--border); gap: 12px; }
   .target-name { font-size: 13px; font-weight: 500; color: var(--text-1); margin-bottom: 2px; }
   .target-address { font-size: 11px; color: var(--text-3); }
   .target-reason { font-size: 12px; color: var(--text-2); margin-top: 4px; }
-
-  .priority-badge {
-    font-size: 11px;
-    font-family: 'DM Mono', monospace;
-    padding: 3px 10px;
-    border-radius: 999px;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
+  .priority-badge { font-size: 11px; font-family: 'DM Mono', monospace; padding: 3px 10px; border-radius: 999px; white-space: nowrap; flex-shrink: 0; }
   .priority-high { background: var(--navy-pale); color: var(--navy); }
   .priority-medium { background: var(--gold-pale); color: var(--gold); }
   .priority-low { background: var(--warm-gray); color: var(--text-3); }
-
-  /* Tactics */
+  /* ── College section styles ── */
+  .college-target-item { display: flex; align-items: flex-start; justify-content: space-between; padding: 12px 14px; background: var(--college-pale); border-radius: var(--radius-sm); border: 1px solid rgba(74,44,122,0.15); gap: 12px; }
+  .college-target-name { font-size: 13px; font-weight: 500; color: var(--college); margin-bottom: 2px; }
+  .college-target-type { font-size: 11px; color: var(--text-3); font-family: 'DM Mono', monospace; letter-spacing: 0.06em; text-transform: uppercase; }
+  .college-target-pop { font-size: 11px; color: var(--text-2); margin-top: 2px; }
+  .college-target-angle { font-size: 12px; color: var(--text-2); margin-top: 5px; line-height: 1.5; }
+  .college-angle-block { padding: 14px 16px; border-radius: var(--radius-sm); margin-bottom: 10px; font-size: 13px; line-height: 1.65; }
+  .college-angle-residential { background: var(--navy-pale); border: 1px solid rgba(26,58,92,0.15); color: var(--navy-deep); }
+  .college-angle-commercial { background: var(--gold-pale); border: 1px solid rgba(201,131,42,0.2); color: var(--text-2); }
+  .college-discount-block { background: var(--college); border-radius: var(--radius-sm); padding: 14px 16px; margin-top: 14px; }
+  .college-discount-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.55); margin-bottom: 6px; }
+  .college-discount-text { font-size: 13px; color: rgba(255,255,255,0.92); line-height: 1.6; }
+  /* ── /College ── */
   .tactic-list { display: flex; flex-direction: column; gap: 14px; }
-
-  .tactic-card {
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-  }
-
-  .tactic-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 16px;
-    background: var(--cream);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .tactic-rank {
-    width: 26px; height: 26px;
-    background: var(--navy);
-    color: white;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    font-weight: 500;
-    flex-shrink: 0;
-  }
-
+  .tactic-card { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
+  .tactic-header { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--cream); border-bottom: 1px solid var(--border); }
+  .tactic-rank { width: 26px; height: 26px; background: var(--navy); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; flex-shrink: 0; }
   .tactic-title { font-size: 14px; font-weight: 500; color: var(--text-1); flex: 1; }
-
-  .tactic-revenue {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--success);
-    background: var(--success-pale);
-    padding: 3px 10px;
-    border-radius: 999px;
-    white-space: nowrap;
-  }
-
+  .tactic-revenue { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--success); background: var(--success-pale); padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
   .tactic-body { padding: 14px 16px; }
   .tactic-desc { font-size: 13px; font-weight: 300; color: var(--text-2); line-height: 1.65; margin-bottom: 10px; }
   .tactic-meta { display: flex; gap: 10px; flex-wrap: wrap; }
-
-  .meta-pill {
-    font-size: 11px;
-    font-family: 'DM Mono', monospace;
-    padding: 3px 9px;
-    border-radius: 999px;
-    background: var(--warm-gray);
-    color: var(--text-2);
-  }
-
-  /* Budget */
+  .meta-pill { font-size: 11px; font-family: 'DM Mono', monospace; padding: 3px 9px; border-radius: 999px; background: var(--warm-gray); color: var(--text-2); }
   .budget-total { font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: var(--navy-deep); margin-bottom: 14px; }
   .budget-list { display: flex; flex-direction: column; gap: 8px; }
-
-  .budget-item {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border);
-  }
-
+  .budget-item { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
   .budget-item:last-child { border-bottom: none; }
-
   .budget-category { font-size: 13px; font-weight: 500; color: var(--text-1); }
   .budget-rationale { font-size: 12px; color: var(--text-3); margin-top: 2px; }
   .budget-amount { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; color: var(--navy); white-space: nowrap; flex-shrink: 0; }
-
-  /* 90-day checklist */
   .checklist-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-
-  .checklist-phase {
-    background: var(--cream);
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-    padding: 14px 16px;
-  }
-
-  .phase-label {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--navy-light);
-    margin-bottom: 10px;
-  }
-
-  .checklist-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 8px;
-    font-size: 12.5px;
-    color: var(--text-2);
-    line-height: 1.5;
-    margin-bottom: 7px;
-  }
-
+  .checklist-phase { background: var(--cream); border-radius: var(--radius-sm); border: 1px solid var(--border); padding: 14px 16px; }
+  .phase-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--navy-light); margin-bottom: 10px; }
+  .checklist-item { display: flex; align-items: flex-start; gap: 8px; font-size: 12.5px; color: var(--text-2); line-height: 1.5; margin-bottom: 7px; }
   .checklist-item:last-child { margin-bottom: 0; }
-
-  .check-icon {
-    width: 16px; height: 16px;
-    border: 1.5px solid var(--border);
-    border-radius: 4px;
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-
-  /* Commercial targets */
-  .commercial-stats {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    padding: 14px 16px;
-    background: var(--gold-pale);
-    border-radius: var(--radius-sm);
-    border: 1px solid rgba(201,131,42,0.2);
-    margin-bottom: 16px;
-  }
-
+  .check-icon { width: 16px; height: 16px; border: 1.5px solid var(--border); border-radius: 4px; flex-shrink: 0; margin-top: 1px; }
+  .commercial-stats { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: var(--gold-pale); border-radius: var(--radius-sm); border: 1px solid rgba(201,131,42,0.2); margin-bottom: 16px; }
   .commercial-revenue { font-family: 'DM Serif Display', serif; font-size: 1.5rem; color: var(--gold); }
   .commercial-revenue-label { font-size: 12px; color: var(--text-2); font-weight: 300; }
   .commercial-list { display: flex; flex-direction: column; gap: 10px; }
-
-  .commercial-card {
-    padding: 14px 16px;
-    background: var(--cream);
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-  }
-
-  .commercial-top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    gap: 10px;
-  }
-
+  .commercial-card { padding: 14px 16px; background: var(--cream); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+  .commercial-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; gap: 10px; }
   .commercial-name { font-size: 14px; font-weight: 500; color: var(--text-1); }
   .commercial-category { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-3); margin-top: 2px; }
-
-  .commercial-rev {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--success);
-    background: var(--success-pale);
-    padding: 3px 10px;
-    border-radius: 999px;
-    white-space: nowrap;
-  }
-
-  .commercial-pitch {
-    font-size: 12.5px;
-    color: var(--text-2);
-    line-height: 1.5;
-    border-top: 1px solid var(--border);
-    padding-top: 8px;
-    margin-top: 8px;
-  }
-
+  .commercial-rev { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--success); background: var(--success-pale); padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+  .commercial-pitch { font-size: 12.5px; color: var(--text-2); line-height: 1.5; border-top: 1px solid var(--border); padding-top: 8px; margin-top: 8px; }
   .commercial-pitch::before { content: '💬 '; font-size: 11px; }
-
-  /* Demographics */
   .demo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
   .demo-stat { background: var(--navy-pale); border-radius: var(--radius-sm); padding: 12px 14px; }
   .demo-value { font-family: 'DM Serif Display', serif; font-size: 1.3rem; color: var(--navy); line-height: 1; margin-bottom: 3px; }
@@ -622,73 +170,21 @@
   .phase-header { background: var(--navy); padding: 10px 12px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.7); }
   .phase-body { padding: 10px 12px; font-size: 12.5px; color: var(--text-2); line-height: 1.55; background: var(--cream); }
   .approach-time { font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text-3); margin-top: 5px; }
-
-  /* Collateral */
   .collateral-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-
   .collateral-card { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
-
-  .collateral-header {
-    background: var(--navy);
-    padding: 14px 16px;
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.6);
-  }
-
+  .collateral-header { background: var(--navy); padding: 14px 16px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.6); }
   .collateral-body { padding: 16px; }
   .collateral-headline { font-family: 'DM Serif Display', serif; font-size: 1rem; color: var(--navy-deep); margin-bottom: 4px; }
   .collateral-sub { font-size: 12px; color: var(--text-3); margin-bottom: 12px; }
   .collateral-bullets { list-style: none; margin-bottom: 12px; }
-
-  .collateral-bullets li {
-    font-size: 12.5px;
-    color: var(--text-2);
-    padding: 3px 0;
-    display: flex; align-items: flex-start; gap: 8px;
-  }
-
+  .collateral-bullets li { font-size: 12.5px; color: var(--text-2); padding: 3px 0; display: flex; align-items: flex-start; gap: 8px; }
   .collateral-bullets li::before { content: '→'; color: var(--gold); flex-shrink: 0; font-size: 11px; margin-top: 2px; }
-
   .collateral-cta { font-size: 12px; font-weight: 500; color: var(--navy); background: var(--navy-pale); padding: 8px 12px; border-radius: 6px; }
-
-  /* Reputation recs */
   .rec-list { display: flex; flex-direction: column; gap: 8px; }
-
-  .rec-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    font-size: 13px;
-    color: var(--text-2);
-    line-height: 1.5;
-    padding: 10px 12px;
-    background: var(--cream);
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--border);
-  }
-
-  .rec-num {
-    width: 22px; height: 22px;
-    background: var(--gold-pale);
-    color: var(--gold);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    font-weight: 500;
-    flex-shrink: 0;
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(14px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
+  .rec-item { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text-2); line-height: 1.5; padding: 10px 12px; background: var(--cream); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+  .rec-num { width: 22px; height: 22px; background: var(--gold-pale); color: var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; flex-shrink: 0; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
   .fade-in { animation: fadeUp 0.4s ease both; }
-
   @media (max-width: 560px) {
     .section-body { padding: 18px; }
     .section-card-header { padding: 14px 18px; }
@@ -698,12 +194,12 @@
     .report-header { padding: 20px; }
     .report-header-top { flex-direction: column; gap: 14px; }
     .page { padding: 20px 16px 60px; }
+    .phase-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 <div class="page">
-
   <header>
     <div class="logo" onclick="window.location.href='/'">
       <div class="logo-mark">
@@ -723,26 +219,11 @@
       <div class="loading-title">Building your Market Growth Strategy</div>
       <p class="loading-sub">We're analyzing your market and building a personalized growth strategy for your location. This takes about <strong>90–120 seconds</strong>.</p>
       <div class="loading-steps">
-        <div class="loading-step" id="step-1">
-          <div class="step-dot" id="dot-1">1</div>
-          <span>Locating your franchise address</span>
-        </div>
-        <div class="loading-step" id="step-2">
-          <div class="step-dot" id="dot-2">2</div>
-          <span>Analyzing your local market</span>
-        </div>
-        <div class="loading-step" id="step-3">
-          <div class="step-dot" id="dot-3">3</div>
-          <span>Researching your competitive landscape</span>
-        </div>
-        <div class="loading-step" id="step-4">
-          <div class="step-dot" id="dot-4">4</div>
-          <span>Identifying growth opportunities</span>
-        </div>
-        <div class="loading-step" id="step-5">
-          <div class="step-dot" id="dot-5">5</div>
-          <span>Building your personalized strategy</span>
-        </div>
+        <div class="loading-step" id="step-1"><div class="step-dot" id="dot-1">1</div><span>Locating your franchise address</span></div>
+        <div class="loading-step" id="step-2"><div class="step-dot" id="dot-2">2</div><span>Analyzing your local market</span></div>
+        <div class="loading-step" id="step-3"><div class="step-dot" id="dot-3">3</div><span>Researching your competitive landscape</span></div>
+        <div class="loading-step" id="step-4"><div class="step-dot" id="dot-4">4</div><span>Identifying growth opportunities</span></div>
+        <div class="loading-step" id="step-5"><div class="step-dot" id="dot-5">5</div><span>Building your personalized strategy</span></div>
       </div>
       <div style="margin-top:24px;padding:12px 16px;background:var(--navy-pale);border-radius:var(--radius-sm);font-size:12px;color:var(--navy);line-height:1.6;text-align:left;">
         💡 <strong>Why does this take time?</strong> FranchiseIQ runs a deep analysis of your specific location — the same work that previously took consultants days to compile manually.
@@ -761,38 +242,31 @@
 
   <!-- Report State -->
   <div id="report-state"></div>
-
 </div>
 
 <script>
   var formData = null;
   var researchData = null;
 
-  function setStep(stepNum, status) {
+  function setStep(stepNum) {
     for (var i = 1; i <= 5; i++) {
       var step = document.getElementById('step-' + i);
       var dot = document.getElementById('dot-' + i);
       if (!step) continue;
       step.classList.remove('active', 'done');
       dot.textContent = i;
-      if (i < stepNum) {
-        step.classList.add('done');
-        dot.textContent = '✓';
-      } else if (i === stepNum) {
-        step.classList.add('active');
-      }
+      if (i < stepNum) { step.classList.add('done'); dot.textContent = '✓'; }
+      else if (i === stepNum) { step.classList.add('active'); }
     }
   }
 
   function showError(msg) {
     document.getElementById('loading-state').style.display = 'none';
     document.getElementById('error-state').style.display = 'block';
-    document.getElementById('error-message').textContent = msg || 'We couldn\'t generate your report. Please try again.';
+    document.getElementById('error-message').textContent = msg || "We couldn't generate your report. Please try again.";
   }
 
-  function safe(val, fallback) {
-    return val !== undefined && val !== null ? val : (fallback || '');
-  }
+  function safe(val, fallback) { return val !== undefined && val !== null ? val : (fallback || ''); }
 
   function threatClass(t) {
     if (!t) return '';
@@ -811,63 +285,55 @@
   }
 
   function renderReport(report) {
-    var store = report.businessProfile || report.storeProfile || {};
-    var loc = report.locationSummary || {};
-    var mkt = report.marketResearch || {};
-    var demo = mkt.demographics || {};
-    var comp = mkt.competitorAnalysis || {};
-    var apt = mkt.apartmentOpportunity || {};
-    var rep = mkt.reputationAudit || {};
-    var plan = report.marketingActionPlan || {};
-    var budget = plan.budgetAllocation || {};
+    var store    = report.businessProfile || report.storeProfile || {};
+    var loc      = report.locationSummary || {};
+    var mkt      = report.marketResearch || {};
+    var demo     = mkt.demographics || {};
+    var comp     = mkt.competitorAnalysis || {};
+    var apt      = mkt.apartmentOpportunity || {};
+    var college  = mkt.collegeOpportunity || null;
+    var rep      = mkt.reputationAudit || {};
+    var plan     = report.marketingActionPlan || {};
+    var budget   = plan.budgetAllocation || {};
     var checklist = plan.checklist90Day || {};
     var commercial = report.commercialTargets || {};
-    var phases = commercial.outreachPhases || {};
+    var phases   = commercial.outreachPhases || {};
     var collateral = report.collateral || {};
-    var onePager = collateral.onePager || {};
+    var onePager  = collateral.onePager || {};
     var doorHanger = collateral.doorHanger || {};
 
     var html = '';
 
     // ── 1. Report Header ──
     html += '<div class="report-header fade-in">';
-    html += '<div class="report-header-top">';
-    html += '<div>';
+    html += '<div class="report-header-top"><div>';
     html += '<div class="report-eyebrow">WaveMAX Laundry · Market Growth Strategy</div>';
     html += '<div class="report-headline">' + safe(loc.headline, 'Your Market Growth Strategy') + '</div>';
     html += '</div>';
-    if (loc.opportunityScore) {
-      html += '<div class="opportunity-badge"><div class="score">' + loc.opportunityScore + '</div><div class="score-label">Opportunity<br>Score</div></div>';
-    }
+    if (loc.opportunityScore) html += '<div class="opportunity-badge"><div class="score">' + loc.opportunityScore + '</div><div class="score-label">Opportunity<br>Score</div></div>';
     html += '</div>';
     if (loc.overview) {
       html += '<div class="report-overview">' + safe(loc.overview);
-      if (loc.topOpportunity) {
-        html += '<div class="top-opportunity">⚡ ' + safe(loc.topOpportunity) + '</div>';
-      }
+      if (loc.topOpportunity) html += '<div class="top-opportunity">⚡ ' + safe(loc.topOpportunity) + '</div>';
       html += '</div>';
     }
     html += '</div>';
 
-    // ── 2. Business Profile & Reputation ──
+    // ── 2. Business Profile ──
     if (store.headline || store.rating) {
       html += '<div class="section-card fade-in">';
       html += '<div class="section-card-header"><div class="section-icon">🏪</div><div><div class="section-title">Your Business Profile & Reputation</div><div class="section-subtitle">Your market position, customer reputation, and immediate opportunities</div></div></div>';
       html += '<div class="section-body">';
-
       if (store.headline) html += '<div class="summary-text" style="font-weight:500;color:var(--navy-deep);font-size:15px;margin-bottom:16px;">' + store.headline + '</div>';
-
       html += '<div class="demo-grid" style="margin-bottom:16px;">';
       if (store.rating) html += '<div class="demo-stat"><div class="demo-value" style="color:var(--gold);">★ ' + store.rating + '</div><div class="demo-label">Google Rating</div></div>';
       if (store.reviewCount) html += '<div class="demo-stat"><div class="demo-value">' + store.reviewCount + '</div><div class="demo-label">Google Reviews</div></div>';
       if (store.washers || store.dryers) html += '<div class="demo-stat"><div class="demo-value">' + safe(store.washers,'?') + '/' + safe(store.dryers,'?') + '</div><div class="demo-label">Washers/Dryers</div></div>';
       html += '</div>';
-
       if (store.ratingVsMarket || store.ratingContext) {
         html += '<div class="sub-label">Rating vs. Market</div>';
         html += '<div style="background:var(--gold-pale);border-radius:var(--radius-sm);padding:14px 16px;font-size:13px;color:var(--text-2);line-height:1.65;border:1px solid rgba(201,131,42,0.2);margin-bottom:16px;">' + (store.ratingVsMarket || store.ratingContext) + '</div>';
       }
-
       if (store.reviewThemes && store.reviewThemes.length > 0) {
         html += '<div class="sub-label">What Your Customers Are Saying</div>';
         html += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">';
@@ -880,46 +346,27 @@
         });
         html += '</div>';
       }
-
       if (store.staffAdvantage) {
         html += '<div style="background:var(--navy);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px;">';
         html += '<div style="font-family:monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:6px;">Staff Advantage</div>';
-        html += '<div style="font-size:13px;color:rgba(255,255,255,0.9);line-height:1.6;">' + store.staffAdvantage + '</div>';
-        html += '</div>';
+        html += '<div style="font-size:13px;color:rgba(255,255,255,0.9);line-height:1.6;">' + store.staffAdvantage + '</div></div>';
       }
-
       if (store.oneGap) {
         html += '<div style="background:#fde8e8;border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:16px;border:1px solid rgba(192,57,43,0.15);">';
         html += '<div style="font-size:11px;font-weight:500;color:var(--danger);margin-bottom:4px;font-family:monospace;letter-spacing:0.08em;text-transform:uppercase;">One Gap to Address</div>';
-        html += '<div style="font-size:13px;color:var(--text-2);">' + store.oneGap + '</div>';
-        html += '</div>';
+        html += '<div style="font-size:13px;color:var(--text-2);">' + store.oneGap + '</div></div>';
       }
-
       if (store.immediateOpportunity) {
         html += '<div style="background:var(--navy);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px;">';
         html += '<div style="font-family:monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:6px;">#1 Priority This Week</div>';
-        html += '<div style="font-size:13px;font-weight:500;color:var(--gold-light);">⚡ ' + store.immediateOpportunity + '</div>';
+        html += '<div style="font-size:13px;font-weight:500;color:var(--gold-light);">⚡ ' + store.immediateOpportunity + '</div></div>';
+      }
+      var actions = store.tacticalActions && store.tacticalActions.length > 0 ? store.tacticalActions : (rep.recommendations || []);
+      if (actions.length > 0) {
+        html += '<div class="sub-label">Tactical Action Items</div><div class="rec-list">';
+        actions.forEach(function(a, i) { html += '<div class="rec-item"><div class="rec-num">' + (i+1) + '</div><span>' + a + '</span></div>'; });
         html += '</div>';
       }
-
-      if (store.tacticalActions && store.tacticalActions.length > 0) {
-        html += '<div class="sub-label">Tactical Action Items</div>';
-        html += '<div class="rec-list">';
-        store.tacticalActions.forEach(function(a, i) {
-          html += '<div class="rec-item"><div class="rec-num">' + (i+1) + '</div><span>' + a + '</span></div>';
-        });
-        html += '</div>';
-      }
-
-      if ((!store.tacticalActions || store.tacticalActions.length === 0) && rep.recommendations && rep.recommendations.length > 0) {
-        html += '<div class="sub-label">Tactical Action Items</div>';
-        html += '<div class="rec-list">';
-        rep.recommendations.forEach(function(r, i) {
-          html += '<div class="rec-item"><div class="rec-num">' + (i+1) + '</div><span>' + r + '</span></div>';
-        });
-        html += '</div>';
-      }
-
       html += '</div></div>';
     }
 
@@ -935,13 +382,8 @@
       if (demo.medianIncome) html += '<div class="demo-stat"><div class="demo-value">' + demo.medianIncome + '</div><div class="demo-label">Median Income</div></div>';
       html += '</div>';
       if (demo.housingEra) html += '<div style="font-size:12.5px;color:var(--text-2);margin-bottom:10px;margin-top:8px;">🏠 ' + demo.housingEra + '</div>';
-      if (demo.renterPercentage && parseInt(demo.renterPercentage) > 45) {
-        html += '<div class="demo-flag">⚡ Above-average renter concentration — strong structural laundromat demand</div>';
-      }
-      if (demo.keyInsight) {
-        html += '<div class="sub-label">What This Means</div>';
-        html += '<div class="summary-text">' + demo.keyInsight + '</div>';
-      }
+      if (demo.renterPercentage && parseInt(demo.renterPercentage) > 45) html += '<div class="demo-flag">⚡ Above-average renter concentration — strong structural laundromat demand</div>';
+      if (demo.keyInsight) { html += '<div class="sub-label">What This Means</div><div class="summary-text">' + demo.keyInsight + '</div>'; }
       html += '</div></div>';
     }
 
@@ -951,18 +393,13 @@
     html += '<div class="section-body">';
     if (comp.summary) html += '<div class="summary-text">' + comp.summary + '</div>';
     if (comp.competitors && comp.competitors.length > 0) {
-      html += '<div class="sub-label">Competitors</div>';
-      html += '<div class="competitor-list">';
+      html += '<div class="sub-label">Competitors</div><div class="competitor-list">';
       comp.competitors.forEach(function(c, i) {
-        html += '<div class="competitor-card">';
-        html += '<div class="comp-rank">' + (i + 1) + '</div>';
-        html += '<div style="flex:1">';
-        html += '<div class="comp-name">' + safe(c.name);
-        if (c.distanceLabel) html += '<span class="distance-label">' + c.distanceLabel + '</span>';
-        html += '</div>';
+        html += '<div class="competitor-card"><div class="comp-rank">' + (i+1) + '</div><div style="flex:1">';
+        html += '<div class="comp-name">' + safe(c.name) + (c.distanceLabel ? '<span class="distance-label">' + c.distanceLabel + '</span>' : '') + '</div>';
         html += '<div class="comp-address">' + safe(c.address) + '</div>';
         html += '<div class="comp-meta">';
-        if (c.rating) html += '<span class="comp-rating">★ ' + c.rating + ' (' + (c.reviewCount || 0) + ' reviews)</span>';
+        if (c.rating) html += '<span class="comp-rating">★ ' + c.rating + ' (' + (c.reviewCount||0) + ' reviews)</span>';
         if (c.threat) html += '<span class="threat-badge ' + threatClass(c.threat) + '">' + c.threat + ' threat</span>';
         html += '</div>';
         if (c.weakness) html += '<div class="comp-weakness">⚠ ' + c.weakness + '</div>';
@@ -977,68 +414,91 @@
     }
     html += '</div></div>';
 
-    // ── 5. Apartment Opportunity ──
+    // ── 5. Apartment Ecosystem ──
     html += '<div class="section-card fade-in">';
     html += '<div class="section-card-header"><div class="section-icon">🏢</div><div><div class="section-title">Apartment Ecosystem</div><div class="section-subtitle">Residential outreach opportunity</div></div></div>';
     html += '<div class="section-body">';
     if (apt.summary) html += '<div class="summary-text">' + apt.summary + '</div>';
     html += '<div class="apt-stats">';
-    html += '<div class="stat-box"><div class="stat-value">' + safe(apt.totalComplexes, '—') + '</div><div class="stat-label">Complexes Nearby</div></div>';
-    html += '<div class="stat-box"><div class="stat-value">' + safe(apt.estimatedHouseholds, '—') + '</div><div class="stat-label">Est. Households</div></div>';
-    html += '<div class="stat-box"><div class="stat-value">' + safe(apt.monthlyLaundrySpend, '—') + '</div><div class="stat-label">Monthly Laundry Spend</div></div>';
+    html += '<div class="stat-box"><div class="stat-value">' + safe(apt.totalComplexes,'—') + '</div><div class="stat-label">Complexes Nearby</div></div>';
+    html += '<div class="stat-box"><div class="stat-value">' + safe(apt.estimatedHouseholds,'—') + '</div><div class="stat-label">Est. Households</div></div>';
+    html += '<div class="stat-box"><div class="stat-value">' + safe(apt.monthlyLaundrySpend,'—') + '</div><div class="stat-label">Monthly Laundry Spend</div></div>';
     html += '</div>';
     if (apt.topTargets && apt.topTargets.length > 0) {
-      html += '<div class="sub-label">Priority Targets</div>';
-      html += '<div class="target-list">';
+      html += '<div class="sub-label">Priority Targets</div><div class="target-list">';
       apt.topTargets.forEach(function(t) {
-        html += '<div class="target-item">';
-        html += '<div style="flex:1">';
-        html += '<div class="target-name">' + safe(t.name);
-        if (t.distanceLabel) html += '<span class="distance-label">' + t.distanceLabel + '</span>';
-        html += '</div>';
+        html += '<div class="target-item"><div style="flex:1">';
+        html += '<div class="target-name">' + safe(t.name) + (t.distanceLabel ? '<span class="distance-label">' + t.distanceLabel + '</span>' : '') + '</div>';
         html += '<div class="target-address">' + safe(t.address) + '</div>';
-        if (t.rating) html += '<div style="font-size:11px;color:var(--gold);margin-top:2px;">★ ' + t.rating + ' (' + (t.reviewCount || 0) + ' reviews)</div>';
-        if (t.laundryFrustration) html += '<div style="font-size:11.5px;color:var(--danger,#c0392b);margin-top:3px;font-style:italic;">⚠ ' + t.laundryFrustration + '</div>';
+        if (t.rating) html += '<div style="font-size:11px;color:var(--gold);margin-top:2px;">★ ' + t.rating + ' (' + (t.reviewCount||0) + ' reviews)</div>';
+        if (t.laundryFrustration) html += '<div style="font-size:11.5px;color:var(--danger);margin-top:3px;font-style:italic;">⚠ ' + t.laundryFrustration + '</div>';
         if (t.reason) html += '<div class="target-reason">' + t.reason + '</div>';
-        html += '</div>';
-        html += '<span class="priority-badge ' + priorityClass(t.priority) + '">' + safe(t.priority) + '</span>';
-        html += '</div>';
+        html += '</div><span class="priority-badge ' + priorityClass(t.priority) + '">' + safe(t.priority) + '</span></div>';
       });
       html += '</div>';
     }
     html += '</div></div>';
 
-    // ── 6. Commercial Targets ──
+    // ── 6. COLLEGES & UNIVERSITIES (conditional) ──
+    if (college && college.present) {
+      html += '<div class="section-card fade-in">';
+      html += '<div class="section-card-header"><div class="section-icon college-icon">🎓</div><div><div class="section-title">College & University Market</div><div class="section-subtitle">Student residential demand + campus commercial accounts</div></div></div>';
+      html += '<div class="section-body">';
+      if (college.summary) html += '<div class="summary-text">' + college.summary + '</div>';
+      if (college.estimatedStudentPopulation) {
+        html += '<div style="display:inline-flex;align-items:center;gap:8px;background:var(--college-pale);border:1px solid rgba(74,44,122,0.2);border-radius:999px;padding:6px 14px;font-family:\'DM Mono\',monospace;font-size:11px;color:var(--college);margin-bottom:16px;">🎓 ' + college.estimatedStudentPopulation + '</div>';
+      }
+      if (college.residentialAngle) {
+        html += '<div class="sub-label">Residential Opportunity</div>';
+        html += '<div class="college-angle-block college-angle-residential">' + college.residentialAngle + '</div>';
+      }
+      if (college.commercialAngle) {
+        html += '<div class="sub-label">Commercial Accounts</div>';
+        html += '<div class="college-angle-block college-angle-commercial">💬 ' + college.commercialAngle + '</div>';
+      }
+      if (college.topTargets && college.topTargets.length > 0) {
+        html += '<div class="sub-label">Priority Targets</div><div class="target-list">';
+        college.topTargets.forEach(function(t) {
+          html += '<div class="college-target-item"><div style="flex:1">';
+          html += '<div class="college-target-name">' + safe(t.name) + (t.distanceLabel ? '<span class="distance-label" style="background:var(--college-pale);color:var(--college);">' + t.distanceLabel + '</span>' : '') + '</div>';
+          if (t.type) html += '<div class="college-target-type">' + t.type + '</div>';
+          if (t.studentPopulation) html += '<div class="college-target-pop">~' + t.studentPopulation + ' students</div>';
+          if (t.outreachAngle) html += '<div class="college-target-angle">' + t.outreachAngle + '</div>';
+          html += '</div><span class="priority-badge ' + priorityClass(t.priority) + '">' + safe(t.priority) + '</span></div>';
+        });
+        html += '</div>';
+      }
+      if (college.studentDiscountRecommendation) {
+        html += '<div class="college-discount-block">';
+        html += '<div class="college-discount-label">Recommended Student Offer</div>';
+        html += '<div class="college-discount-text">🎁 ' + college.studentDiscountRecommendation + '</div>';
+        html += '</div>';
+      }
+      html += '</div></div>';
+    }
+
+    // ── 7. Commercial Targets ──
     html += '<div class="section-card fade-in">';
     html += '<div class="section-card-header"><div class="section-icon">🎯</div><div><div class="section-title">Commercial Account Targets</div><div class="section-subtitle">Nearby businesses with wash & fold potential</div></div></div>';
     html += '<div class="section-body">';
     if (commercial.summary) html += '<div class="summary-text">' + commercial.summary + '</div>';
     if (commercial.totalEstimatedMonthlyRevenue) {
-      html += '<div class="commercial-stats">';
-      html += '<div><div class="commercial-revenue">' + commercial.totalEstimatedMonthlyRevenue + '</div><div class="commercial-revenue-label">estimated monthly commercial revenue potential</div></div>';
-      html += '</div>';
+      html += '<div class="commercial-stats"><div><div class="commercial-revenue">' + commercial.totalEstimatedMonthlyRevenue + '</div><div class="commercial-revenue-label">estimated monthly commercial revenue potential</div></div></div>';
     }
     if (phases.phase1 || phases.phase2 || phases.phase3) {
-      html += '<div class="sub-label">Outreach Sequence</div>';
-      html += '<div class="phase-grid">';
+      html += '<div class="sub-label">Outreach Sequence</div><div class="phase-grid">';
       if (phases.phase1) html += '<div class="phase-card"><div class="phase-header">Phase 1 — Week 1</div><div class="phase-body">' + phases.phase1 + '</div></div>';
       if (phases.phase2) html += '<div class="phase-card"><div class="phase-header">Phase 2 — Month 1</div><div class="phase-body">' + phases.phase2 + '</div></div>';
       if (phases.phase3) html += '<div class="phase-card"><div class="phase-header">Phase 3 — Month 2</div><div class="phase-body">' + phases.phase3 + '</div></div>';
       html += '</div>';
     }
     if (commercial.targets && commercial.targets.length > 0) {
-      html += '<div class="sub-label">Target Businesses</div>';
-      html += '<div class="commercial-list">';
+      html += '<div class="sub-label">Target Businesses</div><div class="commercial-list">';
       commercial.targets.forEach(function(t) {
-        html += '<div class="commercial-card">';
-        html += '<div class="commercial-top">';
-        html += '<div>';
-        html += '<div class="commercial-name">' + safe(t.businessName);
-        if (t.distanceLabel) html += '<span class="distance-label">' + t.distanceLabel + '</span>';
-        html += '</div>';
+        html += '<div class="commercial-card"><div class="commercial-top"><div>';
+        html += '<div class="commercial-name">' + safe(t.businessName) + (t.distanceLabel ? '<span class="distance-label">' + t.distanceLabel + '</span>' : '') + '</div>';
         html += '<div class="commercial-category">' + safe(t.category) + '</div>';
-        html += '</div>';
-        html += '<div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">';
+        html += '</div><div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">';
         if (t.estimatedMonthlyRevenue) html += '<span class="commercial-rev">' + t.estimatedMonthlyRevenue + '</span>';
         html += '<span class="priority-badge ' + priorityClass(t.priority) + '">' + safe(t.priority) + '</span>';
         html += '</div></div>';
@@ -1050,22 +510,19 @@
     }
     html += '</div></div>';
 
-    // ── 7. Marketing Action Plan ──
+    // ── 8. Marketing Action Plan ──
     html += '<div class="section-card fade-in">';
     html += '<div class="section-card-header"><div class="section-icon">📋</div><div><div class="section-title">Marketing Action Plan</div><div class="section-subtitle">Prioritized tactics ranked by revenue impact</div></div></div>';
     html += '<div class="section-body">';
     if (plan.summary) html += '<div class="summary-text">' + plan.summary + '</div>';
     if (plan.tactics && plan.tactics.length > 0) {
-      html += '<div class="sub-label">Prioritized Tactics</div>';
-      html += '<div class="tactic-list">';
+      html += '<div class="sub-label">Prioritized Tactics</div><div class="tactic-list">';
       plan.tactics.forEach(function(t) {
-        html += '<div class="tactic-card">';
-        html += '<div class="tactic-header">';
+        html += '<div class="tactic-card"><div class="tactic-header">';
         html += '<div class="tactic-rank">' + safe(t.rank) + '</div>';
         html += '<div class="tactic-title">' + safe(t.title) + '</div>';
         if (t.estimatedMonthlyRevenue) html += '<div class="tactic-revenue">' + t.estimatedMonthlyRevenue + '/mo</div>';
-        html += '</div>';
-        html += '<div class="tactic-body">';
+        html += '</div><div class="tactic-body">';
         if (t.description) html += '<div class="tactic-desc">' + t.description + '</div>';
         html += '<div class="tactic-meta">';
         if (t.category) html += '<span class="meta-pill">' + t.category + '</span>';
@@ -1076,89 +533,59 @@
       });
       html += '</div>';
     }
-
     if (budget.breakdown && budget.breakdown.length > 0) {
       html += '<div class="sub-label">Budget Allocation</div>';
       if (budget.total) html += '<div class="budget-total">' + budget.total + '</div>';
       html += '<div class="budget-list">';
       budget.breakdown.forEach(function(b) {
-        html += '<div class="budget-item">';
-        html += '<div><div class="budget-category">' + safe(b.category) + '</div><div class="budget-rationale">' + safe(b.rationale) + '</div></div>';
-        html += '<div class="budget-amount">' + safe(b.amount) + '</div>';
-        html += '</div>';
+        html += '<div class="budget-item"><div><div class="budget-category">' + safe(b.category) + '</div><div class="budget-rationale">' + safe(b.rationale) + '</div></div>';
+        html += '<div class="budget-amount">' + safe(b.amount) + '</div></div>';
       });
       html += '</div>';
     }
-
     if (checklist.week1_2 || checklist.month1) {
-      html += '<div class="sub-label">90-Day Checklist</div>';
-      html += '<div class="checklist-grid">';
-      var checkPhases = [
-        { key: 'week1_2', label: 'Weeks 1–2', items: checklist.week1_2 },
-        { key: 'month1',  label: 'Month 1',   items: checklist.month1 },
-        { key: 'month2',  label: 'Month 2',   items: checklist.month2 },
-        { key: 'month3',  label: 'Month 3',   items: checklist.month3 }
-      ];
-      checkPhases.forEach(function(p) {
-        if (!p.items || p.items.length === 0) return;
-        html += '<div class="checklist-phase">';
-        html += '<div class="phase-label">' + p.label + '</div>';
-        p.items.forEach(function(item) {
-          html += '<div class="checklist-item"><div class="check-icon"></div><span>' + item + '</span></div>';
-        });
+      html += '<div class="sub-label">90-Day Checklist</div><div class="checklist-grid">';
+      [{key:'week1_2',label:'Weeks 1–2'},{key:'month1',label:'Month 1'},{key:'month2',label:'Month 2'},{key:'month3',label:'Month 3'}].forEach(function(p) {
+        var items = checklist[p.key];
+        if (!items || items.length === 0) return;
+        html += '<div class="checklist-phase"><div class="phase-label">' + p.label + '</div>';
+        items.forEach(function(item) { html += '<div class="checklist-item"><div class="check-icon"></div><span>' + item + '</span></div>'; });
         html += '</div>';
       });
       html += '</div>';
     }
-
     html += '</div></div>';
 
-    // ── 8. Collateral ──
+    // ── 9. Collateral preview ──
     if (onePager.headline || doorHanger.headline) {
       html += '<div class="section-card fade-in">';
       html += '<div class="section-card-header"><div class="section-icon">📄</div><div><div class="section-title">Print-Ready Collateral</div><div class="section-subtitle">Ready to print and distribute</div></div></div>';
-      html += '<div class="section-body">';
-      html += '<div class="collateral-grid">';
-
+      html += '<div class="section-body"><div class="collateral-grid">';
       if (onePager.headline) {
-        html += '<div class="collateral-card">';
-        html += '<div class="collateral-header">Commercial One-Pager</div>';
-        html += '<div class="collateral-body">';
+        html += '<div class="collateral-card"><div class="collateral-header">Commercial One-Pager</div><div class="collateral-body">';
         html += '<div class="collateral-headline">' + safe(onePager.headline) + '</div>';
         if (onePager.subheadline) html += '<div class="collateral-sub">' + onePager.subheadline + '</div>';
-        if (onePager.bulletPoints) {
-          html += '<ul class="collateral-bullets">';
-          onePager.bulletPoints.forEach(function(b) { html += '<li>' + b + '</li>'; });
-          html += '</ul>';
-        }
+        if (onePager.bulletPoints) { html += '<ul class="collateral-bullets">'; onePager.bulletPoints.forEach(function(b) { html += '<li>' + b + '</li>'; }); html += '</ul>'; }
         if (onePager.callToAction) html += '<div class="collateral-cta">' + onePager.callToAction + '</div>';
         html += '</div></div>';
       }
-
       if (doorHanger.headline) {
-        html += '<div class="collateral-card">';
-        html += '<div class="collateral-header">Apartment Door Hanger</div>';
-        html += '<div class="collateral-body">';
+        html += '<div class="collateral-card"><div class="collateral-header">Apartment Door Hanger</div><div class="collateral-body">';
         html += '<div class="collateral-headline">' + safe(doorHanger.headline) + '</div>';
         if (doorHanger.offerLine) html += '<div class="collateral-sub">' + doorHanger.offerLine + '</div>';
-        if (doorHanger.bulletPoints) {
-          html += '<ul class="collateral-bullets">';
-          doorHanger.bulletPoints.forEach(function(b) { html += '<li>' + b + '</li>'; });
-          html += '</ul>';
-        }
+        if (doorHanger.bulletPoints) { html += '<ul class="collateral-bullets">'; doorHanger.bulletPoints.forEach(function(b) { html += '<li>' + b + '</li>'; }); html += '</ul>'; }
         if (doorHanger.callToAction) html += '<div class="collateral-cta">' + doorHanger.callToAction + '</div>';
         html += '</div></div>';
       }
-
       html += '</div></div></div>';
     }
 
-    // ── Print Collateral Buttons ──
+    // ── Print buttons ──
     html += '<div style="background:var(--white);border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--shadow);padding:24px 28px;margin-bottom:20px;" class="fade-in">';
     html += '<div style="font-family:\'DM Mono\',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-3);margin-bottom:16px;">Print-Ready Collateral</div>';
     html += '<div style="display:flex;gap:12px;flex-wrap:wrap;">';
     html += '<button onclick="openCollateral(\'commercial\')" style="flex:1;min-width:200px;padding:14px 20px;background:var(--navy);color:white;border:none;border-radius:var(--radius-sm);font-family:\'Outfit\',sans-serif;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">📄 Open Commercial One-Pager</button>';
-    html += '<button onclick="openCollateral(\'flyer\')" style="flex:1;min-width:200px;padding:14px 20px;background:var(--teal,#0F7173);color:white;border:none;border-radius:var(--radius-sm);font-family:\'Outfit\',sans-serif;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">🏢 Open Apartment Door Hanger</button>';
+    html += '<button onclick="openCollateral(\'flyer\')" style="flex:1;min-width:200px;padding:14px 20px;background:#0F7173;color:white;border:none;border-radius:var(--radius-sm);font-family:\'Outfit\',sans-serif;font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;">🏢 Open Apartment Door Hanger</button>';
     html += '</div>';
     html += '<div style="font-size:11px;color:var(--text-3);margin-top:10px;font-family:\'DM Mono\',monospace;">Opens in a new tab · populated with your report data · use browser Print or Save as PDF</div>';
     html += '</div>';
@@ -1166,10 +593,7 @@
     html += '<div style="text-align:center;margin-top:32px;"><a href="/" style="font-size:13px;color:var(--text-3);text-decoration:none;">← Generate another report</a></div>';
 
     document.getElementById('report-state').innerHTML = html;
-
-    // Save report data to localStorage for collateral pages
     try { localStorage.setItem('fiq_report', JSON.stringify(report)); } catch(e) {}
-
     document.getElementById('loading-state').style.display = 'none';
     document.getElementById('report-state').style.display = 'block';
   }
@@ -1177,87 +601,51 @@
   async function runPipeline() {
     try {
       var stored = localStorage.getItem('fiq_form_data');
-      if (!stored) {
-        showError('No form data found. Please go back and fill out the form.');
-        return;
-      }
-
+      if (!stored) { showError('No form data found. Please go back and fill out the form.'); return; }
       formData = JSON.parse(stored);
 
-      // Retrieve auth token — required for all API calls
       var token = '';
       try { token = localStorage.getItem('fiq_token') || ''; } catch(e) {}
-      if (!token) {
-        showError('Session expired. Please go back and log in again.');
-        return;
-      }
+      if (!token) { showError('Session expired. Please go back and log in again.'); return; }
 
-      setStep(1, 'active');
-      setTimeout(function() { setStep(2, 'active'); }, 1500);
-      setTimeout(function() { setStep(3, 'active'); }, 3000);
-      setTimeout(function() { setStep(4, 'active'); }, 4500);
+      setStep(1);
+      setTimeout(function() { setStep(2); }, 1500);
+      setTimeout(function() { setStep(3); }, 3000);
+      setTimeout(function() { setStep(4); }, 4500);
 
       var researchRes = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type: 'research', address: formData.address, token: token })
       });
-
       var researchJson = await researchRes.json();
 
-      if (researchRes.status === 401) {
-        showError('Session expired. Please go back and log in again.');
-        try { localStorage.removeItem('fiq_token'); } catch(e) {}
-        return;
-      }
-
-      if (!researchJson.success || !researchJson.research) {
-        showError('Could not retrieve local market data. Error: ' + (researchJson.error || 'Unknown error'));
-        return;
-      }
+      if (researchRes.status === 401) { showError('Session expired. Please go back and log in again.'); try { localStorage.removeItem('fiq_token'); } catch(e) {} return; }
+      if (!researchJson.success || !researchJson.research) { showError('Could not retrieve local market data. Error: ' + (researchJson.error || 'Unknown error')); return; }
 
       researchData = researchJson.research;
-
-      setStep(5, 'active');
+      setStep(5);
 
       var synthRes = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type: 'synthesize', research: researchData, formData: formData, token: token })
       });
-
       var synthJson = await synthRes.json();
 
-      if (synthRes.status === 401) {
-        showError('Session expired. Please go back and log in again.');
-        try { localStorage.removeItem('fiq_token'); } catch(e) {}
-        return;
-      }
-
-      if (!synthJson.success || !synthJson.report) {
-        showError('Could not generate strategy report. Error: ' + (synthJson.error || 'Unknown error'));
-        return;
-      }
+      if (synthRes.status === 401) { showError('Session expired. Please go back and log in again.'); try { localStorage.removeItem('fiq_token'); } catch(e) {} return; }
+      if (!synthJson.success || !synthJson.report) { showError('Could not generate strategy report. Error: ' + (synthJson.error || 'Unknown error')); return; }
 
       renderReport(synthJson.report);
 
-    } catch(err) {
-      showError('Unexpected error: ' + err.message);
-    }
+    } catch(err) { showError('Unexpected error: ' + err.message); }
   }
 
   function openCollateral(type) {
-    if (type === 'commercial') {
-      window.open('/collateral-commercial', '_blank');
-    } else {
-      window.open('/collateral-flyer', '_blank');
-    }
+    window.open(type === 'commercial' ? '/collateral-commercial' : '/collateral-flyer', '_blank');
   }
 
-  window.addEventListener('load', function() {
-    setStep(1, 'active');
-    runPipeline();
-  });
+  window.addEventListener('load', function() { setStep(1); runPipeline(); });
 </script>
 </body>
 </html>
