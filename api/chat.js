@@ -277,6 +277,8 @@ module.exports = async function handler(req, res) {
         '',
         'COMMERCIAL OUTREACH: Use distance to sequence — same block = Week 1, under 1 mile = Month 1, 1-2 miles = Month 2. Six categories: Hotels (linens/uniforms), Restaurants (daily kitchen laundry), Salons & Gyms (towels/gear), Medical & Dental (scrubs), Daycares (bibs/nap mats), Auto Shops (shop rags).',
         '',
+        'DEMOGRAPHICS RULE: The demographics section values (renterPercentage, totalPopulation, medianIncome, housingEra) MUST use ONLY the exact Census numbers provided in the DEMOGRAPHICS section above. Never invent, estimate, or round these numbers. If a value shows N/A, output null for that field. ',
+        '',
         'Output structured JSON only. Every field must be specific and data-grounded.'
       ].join('\n');
 
@@ -333,8 +335,10 @@ module.exports = async function handler(req, res) {
         marketResearch: {
           demographics: {
             headline: "What the demographic profile means for this business",
-            renterPercentage: "XX%", totalPopulation: "XX,XXX", medianIncome: "$XX,XXX",
-            housingEra: "description",
+            renterPercentage: (research.demographics && research.demographics.renterPercentage !== null ? research.demographics.renterPercentage + "%" : "N/A"),
+            totalPopulation: (research.demographics && research.demographics.totalPopulation ? research.demographics.totalPopulation.toLocaleString() : "N/A"),
+            medianIncome: (research.demographics && research.demographics.medianHouseholdIncome ? research.demographics.medianHouseholdIncome : "N/A"),
+            housingEra: (research.demographics && research.demographics.housingEra ? research.demographics.housingEra : "N/A"),
             keyInsight: "2-3 sentences on what these numbers mean for laundromat demand"
           },
           competitorAnalysis: {
