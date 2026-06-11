@@ -438,7 +438,7 @@ module.exports = async function handler(req, res) {
 
       var aiRes = await callAnthropic({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 8000,
+        max_tokens: 6000,
         system: systemPrompt,
         messages: [{ role: 'user', content: prompt }]
       });
