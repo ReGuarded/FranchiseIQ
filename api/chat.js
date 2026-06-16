@@ -437,7 +437,7 @@ module.exports = async function handler(req, res) {
       var prompt = promptParts.join('\n');
 
       var aiRes = await callAnthropic({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 6000,
         system: systemPrompt,
         messages: [{ role: 'user', content: prompt }]

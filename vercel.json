@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/api/chat", "destination": "/api/chat.js" },
     { "source": "/collateral-commercial", "destination": "/collateral-commercial.html" },
     { "source": "/collateral-flyer", "destination": "/collateral-flyer.html" },
     { "source": "/report", "destination": "/report.html" },
