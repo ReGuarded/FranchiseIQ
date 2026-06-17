@@ -125,7 +125,8 @@ module.exports = async function handler(req, res) {
       async function getCensus(zip) {
         if (!zip) return null;
         try {
-          var url = 'https://api.census.gov/data/2022/acs/acs5?get=B01003_001E,B25003_003E,B25003_001E,B19013_001E,B25064_001E,B01002_001E,B25035_001E&for=zip%20code%20tabulation%20area:' + zip;
+          var censusKey = process.env.CENSUS_API_KEY || '';
+          var url = 'https://api.census.gov/data/2022/acs/acs5?get=B01003_001E,B25003_003E,B25003_001E,B19013_001E,B25064_001E,B01002_001E,B25035_001E&for=zip%20code%20tabulation%20area:' + zip + (censusKey ? '&key=' + censusKey : '');
           var r = await (await fetch(url)).json();
           if (!r || r.length < 2) return null;
           var h = r[0]; var v = r[1];
