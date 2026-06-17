@@ -268,17 +268,19 @@ module.exports = async function handler(req, res) {
         '',
         'BUSINESS PROFILE & REPUTATION: Combine store stats and reputation into one rich section. Lead with rating and review count. Compare rating directly to named competitors. Mine the owner\'s own Google reviews for specific themes — cleanliness, staff names, machine quality. If staff are mentioned by name (e.g. Nora, Jessica), call them out specifically — named staff are a marketing moat. Identify one honest gap. Give 4 specific tactical actions.',
         '',
-        'APARTMENT TARGETING: Prioritize complexes that are CLOSEST first. Low-rated complexes (under 3.5 stars) with laundry complaints are HIGHEST priority. Mine review text for broken machines, laundry, maintenance. List minimum 5 complexes.',
+        'APARTMENT TARGETING: Prioritize complexes that are CLOSEST first. Low-rated complexes (under 3.5 stars) with laundry complaints are HIGHEST priority. List 4-5 complexes maximum.',
         '',
         'COLLEGES & UNIVERSITIES: If any colleges, universities, or campuses are present within the research radius, treat them as a dual opportunity — (1) residential: students in off-campus housing are high-frequency laundromat users with no in-unit machines; prioritize by proximity and estimated student population; (2) commercial: campus rec centers, athletics departments, and student housing managers are commercial wash-and-fold accounts. If no colleges are found, set collegeOpportunity to null.',
         '',
-        'COMPETITOR ANALYSIS: Include minimum 5 competitors. Reference specific weaknesses from review text. Coin-only payment, dirty facilities, theft complaints are exploitable weaknesses.',
+        'COMPETITOR ANALYSIS: Include 4-5 competitors maximum. Reference specific weaknesses from review text. Coin-only payment, dirty facilities, theft complaints are exploitable weaknesses.',
         '',
         'BUDGET: Calibrate all recommendations to the stated budget. Never exceed it.',
         '',
         'COMMERCIAL OUTREACH: Use distance to sequence — same block = Week 1, under 1 mile = Month 1, 1-2 miles = Month 2. Six categories: Hotels (linens/uniforms), Restaurants (daily kitchen laundry), Salons & Gyms (towels/gear), Medical & Dental (scrubs), Daycares (bibs/nap mats), Auto Shops (shop rags).',
         '',
-        'Output structured JSON only. Every field must be specific and data-grounded.'
+        'Output structured JSON only. Every field must be specific and data-grounded.',
+        '',
+        'LENGTH DISCIPLINE: Keep every text field to 1-2 sentences maximum. Bullet points: max 10 words each. Tactic descriptions: 2 sentences max. Pitch angles: 1 sentence. The entire JSON response must fit within 7000 tokens — be sharp and specific, not exhaustive.'
       ].join('\n');
 
       var challengesText = (formData.challenges && formData.challenges.length > 0) ? formData.challenges.join(', ') : 'Not specified';
@@ -314,7 +316,7 @@ module.exports = async function handler(req, res) {
         businessProfile: {
           headline: "One sharp sentence on market position — reference actual rating vs named competitors",
           rating: "X.X", reviewCount: "XXX", washers: "XX", dryers: "XX",
-          ratingVsMarket: "2-3 sentences comparing rating directly to every named competitor",
+          ratingVsMarket: "1-2 sentences comparing rating to top competitors",
           reviewThemes: [
             { theme: "Cleanliness", sampleQuote: "actual quote", marketingImplication: "implication" },
             { theme: "Staff warmth", sampleQuote: "quote mentioning staff by name if available", marketingImplication: "implication" },
@@ -327,52 +329,52 @@ module.exports = async function handler(req, res) {
         },
         locationSummary: {
           headline: "Sharp specific sentence on biggest market opportunity",
-          overview: "3-4 sentence narrative grounded in actual data",
+          overview: "2 sentence narrative grounded in actual data",
           opportunityScore: 85,
           topOpportunity: "Single highest-revenue opportunity"
         },
         marketResearch: {
           demographics: {
-            headline: "What the demographic profile means for this business",
+            headline: "One sharp sentence on what demographics mean for demand",
             renterPercentage: "XX%", totalPopulation: "XX,XXX", medianIncome: "$XX,XXX",
             housingEra: "description",
-            keyInsight: "2-3 sentences on what these numbers mean for laundromat demand"
+            keyInsight: "1-2 sentences on laundromat demand implications"
           },
           competitorAnalysis: {
-            summary: "3-4 sentences on competitive landscape",
+            summary: "2 sentences on competitive landscape",
             competitors: [
-              { name: "exact name", address: "address", distanceLabel: "X.X miles away", rating: 4.2, reviewCount: 180, threat: "High/Medium/Low", weakness: "Specific weakness from reviews", opportunityAngle: "How this creates an opening" }
+              { name: "exact name", address: "address", distanceLabel: "X.X miles away", rating: 4.2, reviewCount: 180, threat: "High/Medium/Low", weakness: "Weakness in 10 words or less", opportunityAngle: "Opportunity in 10 words or less" }
             ],
-            competitiveAdvantage: "2-3 sentences on this owner's specific advantages"
+            competitiveAdvantage: "1-2 sentences on competitive advantages"
           },
           apartmentOpportunity: {
-            summary: "3-4 sentences referencing specific complexes",
+            summary: "2 sentences on apartment opportunity",
             totalComplexes: 5, estimatedHouseholds: 1000, monthlyLaundrySpend: "$20,000",
             topTargets: [
-              { name: "exact name", address: "address", distanceLabel: "X.X miles away", priority: "High/Medium/Low", rating: 3.0, reviewCount: 197, laundryFrustration: "Specific complaint or proximity rationale", reason: "Why this complex is a priority" }
+              { name: "exact name", address: "address", distanceLabel: "X.X miles away", priority: "High/Medium/Low", rating: 3.0, reviewCount: 197, laundryFrustration: "Key complaint in 10 words", reason: "Priority reason in 1 sentence" }
             ]
           },
           // ── COLLEGES — null if none found within radius ──
           collegeOpportunity: {
             present: true,
-            summary: "2-3 sentences on the student market opportunity — reference school names and distances",
+            summary: "1-2 sentences on student market opportunity",
             estimatedStudentPopulation: "X,XXX students within radius",
-            residentialAngle: "Why off-campus students are high-frequency users — no in-unit machines, budget-conscious, routine launchers",
-            commercialAngle: "Specific commercial accounts to target: campus rec center, athletics department, student housing management office — with pitch angle for each",
+            residentialAngle: "1 sentence on residential student opportunity",
+            commercialAngle: "1 sentence on commercial campus opportunity",
             topTargets: [
-              { name: "exact school or campus housing name", distanceLabel: "X.X miles away", type: "University/Community College/Campus Housing", studentPopulation: "X,XXX", priority: "High/Medium/Low", outreachAngle: "Specific approach — residential flyers vs commercial account pitch" }
+              { name: "exact school or campus housing name", distanceLabel: "X.X miles away", type: "University/Community College/Campus Housing", studentPopulation: "X,XXX", priority: "High/Medium/Low", outreachAngle: "Outreach angle in 1 sentence" }
             ],
-            studentDiscountRecommendation: "Specific discount offer or loyalty program designed for students (e.g. 10% off with student ID, free dry with wash, loyalty punch card)"
+            studentDiscountRecommendation: "Student offer in 10 words"
           }
         },
         marketingActionPlan: {
-          summary: "2-3 sentences referencing market conditions and stated budget",
+          summary: "1-2 sentences on marketing approach",
           tactics: [
-            { rank: 1, title: "Tactic name", category: "Apartment Outreach / Commercial / Digital / In-Store / Student Outreach", description: "3-4 sentences with specific names and steps", effort: "Low/Medium/High", impact: "Low/Medium/High", timeframe: "Week 1-2 / Month 1 / Ongoing", estimatedMonthlyRevenue: "$X,XXX-X,XXX" }
+            { rank: 1, title: "Tactic name", category: "Apartment Outreach / Commercial / Digital / In-Store / Student Outreach", description: "2 sentences with specific names and steps", effort: "Low/Medium/High", impact: "Low/Medium/High", timeframe: "Week 1-2 / Month 1 / Ongoing", estimatedMonthlyRevenue: "$X,XXX-X,XXX" }
           ],
           budgetAllocation: {
             total: "Must match stated budget",
-            breakdown: [{ category: "name", amount: "$XX", rationale: "specific rationale" }]
+            breakdown: [{ category: "name", amount: "$XX", rationale: "rationale in 8 words" }]
           },
           checklist90Day: {
             week1_2: ["action 1", "action 2", "action 3"],
@@ -382,7 +384,7 @@ module.exports = async function handler(req, res) {
           }
         },
         commercialTargets: {
-          summary: "3-4 sentences on commercial opportunity",
+          summary: "2 sentences on commercial opportunity",
           totalEstimatedMonthlyRevenue: "$X,XXX-X,XXX",
           outreachPhases: {
             phase1: "Week 1 — name specific same-block targets",
@@ -390,7 +392,7 @@ module.exports = async function handler(req, res) {
             phase3: "Month 2 — describe 1-2 mile targets"
           },
           targets: [
-            { businessName: "exact name", category: "Hotel/Gym/Medical/Restaurant/Salon/Auto/Daycare", address: "address", distanceLabel: "X.X miles away", priority: "High/Medium/Low", estimatedMonthlyRevenue: "$XXX-XXX", pitchAngle: "Specific pitch", bestApproachTime: "When and how to approach" }
+            { businessName: "exact name", category: "Hotel/Gym/Medical/Restaurant/Salon/Auto/Daycare", address: "address", distanceLabel: "X.X miles away", priority: "High/Medium/Low", estimatedMonthlyRevenue: "$XXX-XXX", pitchAngle: "Pitch in 1 sentence", bestApproachTime: "Approach timing in 8 words" }
           ]
         },
         collateral: {
@@ -420,7 +422,7 @@ module.exports = async function handler(req, res) {
         '- Budget: ' + budgetText,
         '- Challenges: ' + challengesText,
         '- Marketing: ' + marketingText,
-        '', 'DEMOGRAPHICS:', demoText,
+        '', 'DEMOGRAPHICS (use these EXACT numbers verbatim — do NOT round or estimate):', demoText,
         '', 'COMPETITORS (sorted by distance — list minimum 5):', summarize('competitors'),
         '', 'APARTMENTS (sorted closest first — list minimum 5, prioritize low-rated with laundry complaints):', summarize('apartments'),
         '', 'COLLEGES & UNIVERSITIES (sorted closest first — treat as dual residential + commercial opportunity; null section if none found):', summarize('colleges'),
@@ -439,7 +441,7 @@ module.exports = async function handler(req, res) {
 
       var aiRes = await callAnthropic({
         model: 'claude-sonnet-4-6',
-        max_tokens: 6000,
+        max_tokens: 8000,
         system: systemPrompt,
         messages: [{ role: 'user', content: prompt }]
       });
