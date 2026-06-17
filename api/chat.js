@@ -153,8 +153,8 @@ module.exports = async function handler(req, res) {
           var detUrl = 'https://maps.googleapis.com/maps/api/place/details/json?place_id=' + place.place_id + '&fields=name,rating,user_ratings_total,reviews,formatted_phone_number,website&key=' + GOOGLE_KEY;
           var det = await (await fetch(detUrl)).json();
           var d = det.result || {};
-          var reviews = (d.reviews || []).slice(0, 5).map(function(r) {
-            return { rating: r.rating, text: (r.text || '').substring(0, 250) };
+          var reviews = (d.reviews || []).slice(0, 3).map(function(r) {
+            return { rating: r.rating, text: (r.text || '').substring(0, 150) };
           }).filter(function(r) { return r.text.length > 10; });
           return { name: d.name || place.name, rating: d.rating || place.rating, reviewCount: d.user_ratings_total || place.user_ratings_total || 0, phone: d.formatted_phone_number || null, reviews: reviews };
         } catch(e) { return null; }
@@ -182,7 +182,7 @@ module.exports = async function handler(req, res) {
               var pLat = d.geometry ? d.geometry.location.lat : (place.geometry ? place.geometry.location.lat : null);
               var pLng = d.geometry ? d.geometry.location.lng : (place.geometry ? place.geometry.location.lng : null);
               var dm = distMiles(lat, lng, pLat, pLng);
-              var reviews = (d.reviews || []).slice(0, 3).map(function(r) { return { rating: r.rating, text: (r.text || '').substring(0, 300) }; }).filter(function(r) { return r.text.length > 20; });
+              var reviews = (d.reviews || []).slice(0, 3).map(function(r) { return { rating: r.rating, text: (r.text || '').substring(0, 150) }; }).filter(function(r) { return r.text.length > 20; });
               return { name: d.name || place.name, address: d.formatted_address || place.vicinity, phone: d.formatted_phone_number || null, rating: d.rating || place.rating || null, reviewCount: d.user_ratings_total || place.user_ratings_total || 0, placeId: place.place_id, lat: pLat, lng: pLng, distanceMiles: dm, distanceLabel: fmtDist(dm), reviews: reviews };
             } catch(e) { return { name: place.name, address: place.vicinity, rating: place.rating || null, reviewCount: place.user_ratings_total || 0, placeId: place.place_id, reviews: [] }; }
           }));
@@ -294,7 +294,7 @@ module.exports = async function handler(req, res) {
         return research[cat].results.map(function(p) {
           var lines = [p.name + (p.distanceLabel ? ' [' + p.distanceLabel + ']' : '') + (p.address ? ' — ' + p.address : '')];
           if (p.rating) lines.push(p.rating + ' stars (' + (p.reviewCount || 0) + ' reviews)');
-          if (p.reviews) p.reviews.forEach(function(r) { if (r.text && r.text.length > 20) lines.push('  Review (' + r.rating + 'star): "' + r.text.substring(0, 250) + '"'); });
+          if (p.reviews) p.reviews.forEach(function(r) { if (r.text && r.text.length > 20) lines.push('  Review (' + r.rating + 'star): "' + r.text.substring(0, 150) + '"'); });
           return lines.join('\n');
         }).join('\n\n');
       }
@@ -308,7 +308,7 @@ module.exports = async function handler(req, res) {
       var ownerText = 'Could not retrieve — use competitor data for context';
       if (research.ownerProfile) {
         var op = research.ownerProfile;
-        var revLines = (op.reviews || []).map(function(r) { return '  (' + r.rating + 'star): "' + r.text.substring(0, 200) + '"'; }).join('\n');
+        var revLines = (op.reviews || []).map(function(r) { return '  (' + r.rating + 'star): "' + r.text.substring(0, 150) + '"'; }).join('\n');
         ownerText = 'Name: ' + (op.name || 'N/A') + '\nRating: ' + (op.rating ? op.rating + ' stars' : 'N/A') + '\nReviews: ' + (op.reviewCount || 'N/A') + '\nPhone: ' + (op.phone || 'N/A') + (revLines ? '\nSample reviews:\n' + revLines : '');
       }
 
